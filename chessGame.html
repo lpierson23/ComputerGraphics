@@ -7,21 +7,15 @@
 
 attribute  vec4 a_vPosition;
 attribute  vec4 a_vColor;
-attribute  vec2 a_vTexCoord;
 
 uniform mat4 u_modelViewMatrix;
 uniform mat4 u_projectionMatrix;
 
 varying vec4 v_fColor;
-varying vec2 v_fTexCoord;
-
-uniform vec3 u_theta;
 
 void main() 
 {
-    
     v_fColor = a_vColor;
-    v_fTexCoord = a_vTexCoord;
     gl_Position = u_projectionMatrix * u_modelViewMatrix * a_vPosition;
 } 
 </script>
@@ -31,14 +25,11 @@ void main()
 precision mediump float;
 
 varying vec4 v_fColor;
-varying  vec2 v_fTexCoord;
-
-uniform sampler2D u_TextureSampler;
 
 void
 main()
 {
-    gl_FragColor = v_fColor * texture2D( u_TextureSampler, v_fTexCoord );
+    gl_FragColor = v_fColor;
 }
 </script>
 
@@ -54,33 +45,6 @@ Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 
 <p> </p>
-<div>
-    zNear .01<input id="zNearSlider" type="range"
-    min=".01" max="3" step="0.01" value="0.3" />
-    3
-</div>
-<div>
-    zFar 3<input id="zFarSlider" type="range"
-    min="3" max="50" step="1.0" value="3" />
-    50
-</div>
-<div>
-    fov 10<input id="fovSlider" type="range"
-    min="10" max="170" step="5" value="45" />
-    170
-</div>
-<div>
-    aspect 0.5<input id="aspectSlider" type="range"
-    min="0.5" max="2" step="0.1" value="1" />
-    2
-</div>
-
-<select id="Texture Style" size="4">
-    <option value="0">Nearest</option>
-    <option value="1">Linear</option>
-    <option value="2">MipMap Nearest</option>
-    <option value="3">MipMap Linear</option>
-</select>
 
 </body>
 </html>
