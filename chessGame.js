@@ -36,105 +36,105 @@ var m_mousex = 1;
 var m_mousey = 1;
 var trackballMove = false;
 
-var whitePieces = [
+var blackPieces = [
     {name: "king",
-    location: [1, 4],
+    location: [0, 3],
     inPlay: true},
     {name: "queen",
-    location: [1, 5],
+    location: [0, 4],
     inPlay: true},
     {name: "bishop1",
-    location: [1, 6],
+    location: [0, 5],
     inPlay: true},
     {name: "bishop2",
-    location: [1, 3],
+    location: [0, 2],
     inPlay: true},
     {name: "knight1",
-    location: [1, 7],
+    location: [0, 6],
     inPlay: true},
     {name: "knight2",
-    location: [1, 2],
+    location: [0, 1],
     inPlay: true},
     {name: "rook1",
-    location: [1, 8],
+    location: [0, 7],
     inPlay: true},
     {name: "rook2",
-    location: [1, 1],
+    location: [0, 0],
     inPlay: true},
     {name: "pawn1",
-    location: [2, 1],
+    location: [1, 0],
     inPlay: true},
     {name: "pawn2",
-    location: [2, 2],
+    location: [1, 1],
     inPlay: true},
     {name: "pawn3",
-    location: [2, 3],
+    location: [1, 2],
     inPlay: true},
     {name: "pawn4",
-    location: [2, 4],
+    location: [1, 3],
     inPlay: true},
     {name: "pawn5",
-    location: [2, 5],
+    location: [1, 4],
     inPlay: true},
     {name: "pawn6",
-    location: [2, 6],
+    location: [1, 5],
     inPlay: true},
     {name: "pawn7",
-    location: [2, 7],
+    location: [1, 6],
     inPlay: true},
     {name: "pawn8",
-    location: [2, 8],
+    location: [1, 7],
     inPlay: true},
 ];
 
-var blackPieces = [
+var whitePieces = [
     {name: "king",
-    location: [8, 4],
-    inPlay: true},
-    {name: "queen",
-    location: [8, 5],
-    inPlay: true},
-    {name: "bishop1",
-    location: [8, 6],
-    inPlay: true},
-    {name: "bishop2",
-    location: [8, 3],
-    inPlay: true},
-    {name: "knight1",
-    location: [8, 7],
-    inPlay: true},
-    {name: "knight2",
-    location: [8, 2],
-    inPlay: true},
-    {name: "rook1",
-    location: [8, 8],
-    inPlay: true},
-    {name: "rook2",
-    location: [8, 1],
-    inPlay: true},
-    {name: "pawn1",
-    location: [7, 1],
-    inPlay: true},
-    {name: "pawn2",
-    location: [7, 2],
-    inPlay: true},
-    {name: "pawn3",
     location: [7, 3],
     inPlay: true},
-    {name: "pawn4",
+    {name: "queen",
     location: [7, 4],
     inPlay: true},
-    {name: "pawn5",
+    {name: "bishop1",
     location: [7, 5],
     inPlay: true},
-    {name: "pawn6",
+    {name: "bishop2",
+    location: [7, 2],
+    inPlay: true},
+    {name: "knight1",
     location: [7, 6],
     inPlay: true},
-    {name: "pawn7",
+    {name: "knight2",
+    location: [7, 1],
+    inPlay: true},
+    {name: "rook1",
     location: [7, 7],
     inPlay: true},
+    {name: "rook2",
+    location: [7, 0],
+    inPlay: true},
+    {name: "pawn1",
+    location: [6, 0],
+    inPlay: true},
+    {name: "pawn2",
+    location: [6, 1],
+    inPlay: true},
+    {name: "pawn3",
+    location: [6, 2],
+    inPlay: true},
+    {name: "pawn4",
+    location: [6, 3],
+    inPlay: true},
+    {name: "pawn5",
+    location: [6, 4],
+    inPlay: true},
+    {name: "pawn6",
+    location: [6, 5],
+    inPlay: true},
+    {name: "pawn7",
+    location: [6, 6],
+    inPlay: true},
     {name: "pawn8",
-    location: [7, 8],
+    location: [6, 7],
     inPlay: true},
 ];
 
@@ -361,10 +361,59 @@ function drawRook() {
     }
 }
 
+function calculatePawnVertices(xLoc, yLoc){
+    var pawnVertices = [
+        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 )
+    ];
+
+    return pawnVertices;
+}
 function drawPawn() {
+    var pawnXLoc = 0;
+    var pawnYLoc = 0;
+    var pawnVertices;
 
+    for (var i = 8; i < 16; i++){
+        if (whitePieces[i]["inPlay"]){
+            pawnXLoc = whitePieces[i]["location"][1];
+            console.log(pawnXLoc);
+            pawnYLoc = whitePieces[i]["location"][0];
+            console.log(pawnYLoc);
 
+            pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
+            console.log(pawnVertices);
+            
+            quad( 1, 0, 3, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 2, 3, 7, 6, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 3, 0, 4, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 6, 5, 1, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 4, 5, 6, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 5, 4, 0, 1, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
+        }
+        if (blackPieces[i]["inPlay"]){
+            pawnXLoc = blackPieces[i]["location"][1];
+            console.log(pawnXLoc);
+            pawnYLoc = blackPieces[i]["location"][0];
+            console.log(pawnYLoc);
+
+            pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
+
+            quad( 1, 0, 3, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 2, 3, 7, 6, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 3, 0, 4, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 6, 5, 1, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 4, 5, 6, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 5, 4, 0, 1, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        }
+    }
 }
 
 function drawPieces() {
