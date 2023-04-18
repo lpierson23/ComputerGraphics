@@ -9,9 +9,20 @@ attribute vec4 a_vColor;
 varying vec4 v_fColor;
 uniform mat4 u_ctMatrix;
 
+uniform float u_theta;
+
 void main()
 {
-  gl_Position = u_ctMatrix * a_vPosition;
+
+  float s = sin(u_theta);
+  float c = cos(u_theta);
+
+  gl_Position.x = c * a_vPosition.x - s * a_vPosition.y;
+  gl_Position.y = s * a_vPosition.x + c * a_vPosition.y;
+  gl_Position.z = a_vPosition.z;
+  gl_Position.w = a_vPosition.w;
+
+  gl_Position = u_ctMatrix * gl_Position;
   v_fColor = a_vColor;
 }
 </script>
