@@ -36,7 +36,7 @@ var m_mousex = 1;
 var m_mousey = 1;
 var trackballMove = false;
 
-var blackPieces = [
+var whitePieces = [
     {name: "king",
     location: [0, 3],
     inPlay: true},
@@ -87,7 +87,7 @@ var blackPieces = [
     inPlay: true},
 ];
 
-var whitePieces = [
+var blackPieces = [
     {name: "king",
     location: [7, 3],
     inPlay: true},
@@ -285,6 +285,21 @@ function quad(a, b, c, d, vertices, color)
     }
 }
 
+function calculatePawnVertices(xLoc, yLoc){
+    var vertices = [
+        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 )
+    ];
+
+    return vertices;
+}
+
 function drawKing() {
     if (whitePieces[0]["inPlay"]){
 
@@ -323,22 +338,115 @@ function drawBishop() {
     }
 }
 
-function drawKnight() {
-    
-    if (whitePieces[4]["inPlay"]){
+function calculateKnightVertices(xLoc, yLoc) {
+    var vertices = [
+        //base square
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
 
+        // small rectangle on top
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 )
+    ];
+
+    return vertices;
+}
+
+function drawKnight() {
+    var knightXLoc = 0;
+    var knightYLoc = 0;
+    var knightVertices;
+
+    if (whitePieces[4]["inPlay"]){
+        knightXLoc = whitePieces[4]["location"][1];
+        knightYLoc = whitePieces[4]["location"][0];
+        knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            
+        quad( 1, 0, 3, 2, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+
+        quad( 9, 8, 11, 10, knightVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 10, 11, 15, 14, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 11, 8, 12, 15, knightVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 14, 13, 9, 10, knightVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 12, 13, 14, 15, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 13, 12, 8, 9, knightVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
     } 
 
     if (whitePieces[5]["inPlay"]){
+        knightXLoc = whitePieces[5]["location"][1];
+        knightYLoc = whitePieces[5]["location"][0];
+        knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            
+        quad( 1, 0, 3, 2, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
 
+        quad( 9, 8, 11, 10, knightVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 10, 11, 15, 14, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 11, 8, 12, 15, knightVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 14, 13, 9, 10, knightVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 12, 13, 14, 15, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 13, 12, 8, 9, knightVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
     }
 
     if (blackPieces[4]["inPlay"]){
+        knightXLoc = blackPieces[4]["location"][1];
+        knightYLoc = blackPieces[4]["location"][0];
+        knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            
+        quad( 1, 0, 3, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
+        quad( 9, 8, 11, 10, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 10, 11, 15, 14, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 11, 8, 12, 15, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 14, 13, 9, 10, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 12, 13, 14, 15, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 13, 12, 8, 9, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
     }
 
     if (blackPieces[5]["inPlay"]){
+        knightXLoc = blackPieces[5]["location"][1];
+        knightYLoc = blackPieces[5]["location"][0];
+        knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            
+        quad( 1, 0, 3, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
+        quad( 9, 8, 11, 10, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 10, 11, 15, 14, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 11, 8, 12, 15, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 14, 13, 9, 10, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 12, 13, 14, 15, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 13, 12, 8, 9, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
     }
 
 }
@@ -361,20 +469,6 @@ function drawRook() {
     }
 }
 
-function calculatePawnVertices(xLoc, yLoc){
-    var pawnVertices = [
-        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 )
-    ];
-
-    return pawnVertices;
-}
 function drawPawn() {
     var pawnXLoc = 0;
     var pawnYLoc = 0;
@@ -389,14 +483,13 @@ function drawPawn() {
 
             pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
             console.log(pawnVertices);
-            
-            quad( 1, 0, 3, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 2, 3, 7, 6, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 3, 0, 4, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 6, 5, 1, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 4, 5, 6, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 5, 4, 0, 1, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
+            quad( 1, 0, 3, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 2, 3, 7, 6, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 3, 0, 4, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 6, 5, 1, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 4, 5, 6, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 5, 4, 0, 1, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
         }
         if (blackPieces[i]["inPlay"]){
             pawnXLoc = blackPieces[i]["location"][1];
@@ -406,12 +499,13 @@ function drawPawn() {
 
             pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
 
-            quad( 1, 0, 3, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 2, 3, 7, 6, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 3, 0, 4, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 6, 5, 1, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 4, 5, 6, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 5, 4, 0, 1, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 1, 0, 3, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 2, 3, 7, 6, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 3, 0, 4, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 6, 5, 1, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 4, 5, 6, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 5, 4, 0, 1, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+
         }
     }
 }
