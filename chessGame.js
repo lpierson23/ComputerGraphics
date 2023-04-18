@@ -19,6 +19,7 @@ var pm = mat4(1.0);
 
 var points = [];
 var boardPoints = [];
+var pawnPoints = [];
 var colors = [];
 
 var ctMatrix;
@@ -37,115 +38,115 @@ var trackballMove = false;
 
 var whitePieces = [
     {name: "king",
-    location: (1, 4),
+    location: [1, 4],
     inPlay: true},
     {name: "queen",
-    location: (1, 5),
+    location: [1, 5],
     inPlay: true},
     {name: "bishop1",
-    location: (1, 6),
+    location: [1, 6],
     inPlay: true},
     {name: "bishop2",
-    location: (1, 3),
+    location: [1, 3],
     inPlay: true},
     {name: "knight1",
-    location: (1, 7),
+    location: [1, 7],
     inPlay: true},
     {name: "knight2",
-    location: (1, 2),
+    location: [1, 2],
     inPlay: true},
     {name: "rook1",
-    location: (1, 8),
+    location: [1, 8],
     inPlay: true},
     {name: "rook2",
-    location: (1, 1),
+    location: [1, 1],
     inPlay: true},
     {name: "pawn1",
-    location: (2, 1),
+    location: [2, 1],
     inPlay: true},
     {name: "pawn2",
-    location: (2, 2),
+    location: [2, 2],
     inPlay: true},
     {name: "pawn3",
-    location: (2, 3),
+    location: [2, 3],
     inPlay: true},
     {name: "pawn4",
-    location: (2, 4),
+    location: [2, 4],
     inPlay: true},
     {name: "pawn5",
-    location: (2, 5),
+    location: [2, 5],
     inPlay: true},
     {name: "pawn6",
-    location: (2, 6),
+    location: [2, 6],
     inPlay: true},
     {name: "pawn7",
-    location: (2, 7),
+    location: [2, 7],
     inPlay: true},
     {name: "pawn8",
-    location: (2, 8),
+    location: [2, 8],
     inPlay: true},
 ];
 
 var blackPieces = [
     {name: "king",
-    location: (8, 4),
+    location: [8, 4],
     inPlay: true},
     {name: "queen",
-    location: (8, 5),
+    location: [8, 5],
     inPlay: true},
     {name: "bishop1",
-    location: (8, 6),
+    location: [8, 6],
     inPlay: true},
     {name: "bishop2",
-    location: (8, 3),
+    location: [8, 3],
     inPlay: true},
     {name: "knight1",
-    location: (8, 7),
+    location: [8, 7],
     inPlay: true},
     {name: "knight2",
-    location: (8, 2),
+    location: [8, 2],
     inPlay: true},
     {name: "rook1",
-    location: (8, 8),
+    location: [8, 8],
     inPlay: true},
     {name: "rook2",
-    location: (8, 1),
+    location: [8, 1],
     inPlay: true},
     {name: "pawn1",
-    location: (7, 1),
+    location: [7, 1],
     inPlay: true},
     {name: "pawn2",
-    location: (7, 2),
+    location: [7, 2],
     inPlay: true},
     {name: "pawn3",
-    location: (7, 3),
+    location: [7, 3],
     inPlay: true},
     {name: "pawn4",
-    location: (7, 4),
+    location: [7, 4],
     inPlay: true},
     {name: "pawn5",
-    location: (7, 5),
+    location: [7, 5],
     inPlay: true},
     {name: "pawn6",
-    location: (7, 6),
+    location: [7, 6],
     inPlay: true},
     {name: "pawn7",
-    location: (7, 7),
+    location: [7, 7],
     inPlay: true},
     {name: "pawn8",
-    location: (7, 8),
+    location: [7, 8],
     inPlay: true},
 ];
 
 var boardVertices = [
-                vec4( -0.7, -0.7,  0.05, 1.0 ),
-                vec4( -0.7,  0.7,  0.05, 1.0 ),
-                vec4(  0.7,  0.7,  0.05, 1.0 ),
-                vec4(  0.7, -0.7,  0.05, 1.0 ),
-                vec4( -0.7, -0.7, -0.05, 1.0 ),
-                vec4( -0.7,  0.7, -0.05, 1.0 ),
-                vec4(  0.7,  0.7, -0.05, 1.0 ),
-                vec4(  0.7, -0.7, -0.05, 1.0 )
+                vec4( -0.8, -0.8,  0.05, 1.0 ),
+                vec4( -0.8,  0.8,  0.05, 1.0 ),
+                vec4(  0.8,  0.8,  0.05, 1.0 ),
+                vec4(  0.8, -0.8,  0.05, 1.0 ),
+                vec4( -0.8, -0.8, -0.05, 1.0 ),
+                vec4( -0.8,  0.8, -0.05, 1.0 ),
+                vec4(  0.8,  0.8, -0.05, 1.0 ),
+                vec4(  0.8, -0.8, -0.05, 1.0 )
                 ];
 
 var vertexColors = [
@@ -192,6 +193,7 @@ window.onload = function init()
     m_curquat = trackball(0, 0, 0, 0);
 
     createBoard();
+    drawPieces();
  
     //  Load shaders and initialize attribute buffers
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
@@ -207,7 +209,7 @@ window.onload = function init()
 
     vBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(boardPoints), gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(points), gl.STATIC_DRAW );
 
     a_vPositionLoc = gl.getAttribLocation( program, "a_vPosition" );
     gl.vertexAttribPointer( a_vPositionLoc, 4, gl.FLOAT, false, 0, 0 );
@@ -260,41 +262,103 @@ function playBook() {
 
 function createBoard()
 {
-    boardquad( 1, 0, 3, 2 );
-    boardquad( 2, 3, 7, 6 );
-    boardquad( 3, 0, 4, 7 );
-    boardquad( 6, 5, 1, 2 );
-    boardquad( 4, 5, 6, 7 );
-    boardquad( 5, 4, 0, 1 );
+    quad( 1, 0, 3, 2, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
+    quad( 2, 3, 7, 6, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
+    quad( 3, 0, 4, 7, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
+    quad( 6, 5, 1, 2, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
+    quad( 4, 5, 6, 7, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
+    quad( 5, 4, 0, 1, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
 
     //to do: add grid texture to one face of the board to make it 8x8
 
+    //to do: add shading
+
 }
 
-function boardquad(a, b, c, d)
+function quad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
     for ( var i = 0; i < indices.length; ++i ) {
-        boardPoints.push( boardVertices[indices[i]] );
-        colors.push( vec4(0.5, 0.5, 0.5, 1.0) );
+        points.push( vertices[indices[i]] );
+        colors.push( color );
+    }
+}
+
+function drawKing() {
+    if (whitePieces[0]["inPlay"]){
+
+    }
+
+    if (blackPieces[0]["inPlay"]){
+
     }
 }
 
 function drawQueen() {
+    if (whitePieces[1]["inPlay"]){
 
+    }
+
+    if (blackPieces[1]["inPlay"]){
+
+    }
 }
 
 function drawBishop() {
+    if (whitePieces[2]["inPlay"]){
 
+    } 
+
+    if (whitePieces[3]["inPlay"]){
+
+    }
+
+    if (blackPieces[2]["inPlay"]){
+
+    }
+
+    if (blackPieces[3]["inPlay"]){
+
+    }
 }
 
 function drawKnight() {
+    
+    if (whitePieces[4]["inPlay"]){
+
+    } 
+
+    if (whitePieces[5]["inPlay"]){
+
+    }
+
+    if (blackPieces[4]["inPlay"]){
+
+    }
+
+    if (blackPieces[5]["inPlay"]){
+
+    }
 
 }
 
 function drawRook() {
+    if (whitePieces[6]["inPlay"]){
 
+    } 
+
+    if (whitePieces[7]["inPlay"]){
+
+    }
+
+    if (blackPieces[6]["inPlay"]){
+
+    }
+
+    if (blackPieces[7]["inPlay"]){
+
+    }
 }
 
 function drawPawn() {
@@ -302,7 +366,12 @@ function drawPawn() {
 }
 
 function drawPieces() {
-
+    drawKing();
+    drawQueen();
+    drawBishop();
+    drawKnight();
+    drawRook();
+    drawPawn();
 }
 
 // pause functions
@@ -341,6 +410,6 @@ function render()
     }
     gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix));
     
-    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+    gl.drawArrays( gl.TRIANGLES, 0, points.length );
     requestAnimFrame( render );
 }
