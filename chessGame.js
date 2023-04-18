@@ -336,12 +336,142 @@ function playBook(piece) {
     }
 
     //queen
+    if (piece["name"] == "queen" && piece["inPlay"]){
+
+    }
 
     //bishop
+    if (piece["name"] == "bishop" && piece["inPlay"]){
+
+    }
 
     //knight
+    if (piece["name"] == "knight" && piece["inPlay"]){
+        if (pieceColor == white){
+            // suggest if there is no piece in the spot or a piece of the other color on left
+            if(checkIfPiece(xLoc - 1, yLoc + 2) != 2){
+                //highlight ending square
+                var moveKnightVertices = highlightMoves(xLoc - 1, yLoc + 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+
+                //lightly highlight path squares
+                var moveKnightVertices = highlightMoves(xLoc, yLoc + 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+
+                var moveKnightVertices = highlightMoves(xLoc, yLoc + 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+            }
+
+            // suggest if there is no piece in the spot or a piece of the other color on right
+            if(checkIfPiece(xLoc + 1, yLoc + 2) != 2){
+                //highlight ending square
+                var moveKnightVertices = highlightMoves(xLoc + 1, yLoc + 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+
+                //lightly highlight path squares
+                var moveKnightVertices = highlightMoves(xLoc, yLoc + 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+
+                var moveKnightVertices = highlightMoves(xLoc, yLoc + 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+            }
+        }
+
+        if (pieceColor == black){
+            // suggest if there is no piece in the spot or a piece of the other color on left
+            if(checkIfPiece(xLoc - 1, yLoc - 2) != 2){
+                //highlight ending square
+                var moveKnightVertices = highlightMoves(xLoc - 1, yLoc - 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+
+                //lightly highlight path squares
+                var moveKnightVertices = highlightMoves(xLoc, yLoc - 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+
+                var moveKnightVertices = highlightMoves(xLoc, yLoc - 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+            }
+
+            // suggest if there is no piece in the spot or a piece of the other color on right
+            if(checkIfPiece(xLoc + 1, yLoc - 2) != 2){
+                //highlight ending square
+                var moveKnightVertices = highlightMoves(xLoc + 1, yLoc - 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+
+                //lightly highlight path squares
+                var moveKnightVertices = highlightMoves(xLoc, yLoc - 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+
+                var moveKnightVertices = highlightMoves(xLoc, yLoc - 2);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
+            }
+        }
+    }
 
     //rook
+    if (piece["name"] == "rook" && piece["inPlay"]){
+
+    }
 
     //pawn
     if (piece["name"] == "pawn" && piece["inPlay"]){
