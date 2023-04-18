@@ -36,106 +36,139 @@ var m_mousex = 1;
 var m_mousey = 1;
 var trackballMove = false;
 
+// piece data (location is [y, x])
 var whitePieces = [
     {name: "king",
     location: [0, 3],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "queen",
     location: [0, 4],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "bishop1",
     location: [0, 5],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "bishop2",
     location: [0, 2],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "knight1",
     location: [0, 6],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "knight2",
     location: [0, 1],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "rook1",
     location: [0, 7],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "rook2",
     location: [0, 0],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn1",
     location: [1, 0],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn2",
     location: [1, 1],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn3",
     location: [1, 2],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn4",
     location: [1, 3],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn5",
     location: [1, 4],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn6",
     location: [1, 5],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn7",
     location: [1, 6],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn8",
     location: [1, 7],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
 ];
 
 var blackPieces = [
     {name: "king",
     location: [7, 3],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "queen",
     location: [7, 4],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "bishop1",
     location: [7, 5],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "bishop2",
     location: [7, 2],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "knight1",
     location: [7, 6],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "knight2",
     location: [7, 1],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "rook1",
     location: [7, 7],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "rook2",
     location: [7, 0],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn1",
     location: [6, 0],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn2",
     location: [6, 1],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn3",
     location: [6, 2],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn4",
     location: [6, 3],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn5",
     location: [6, 4],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn6",
     location: [6, 5],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn7",
     location: [6, 6],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn8",
     location: [6, 7],
-    inPlay: true},
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
 ];
 
 var boardVertices = [
@@ -246,8 +279,61 @@ window.onload = function init()
 
 }
 
-function playBook() {
+function highlightMoves(xLoc, yLoc){
+    // calculate vertices for a square where piece can move
+    // should appear as a yellow square slightly raised from the board
+    var vertices = [
+        vec4( -0.8 + ((0.2) * xLoc) + 0.2 , -0.8 + ((0.2) * yLoc),  0.06, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.2,  -0.8 + ((0.2) * yLoc) + 0.20,  0.06, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc),  -0.8 + ((0.2) * yLoc) + 0.20,  0.06, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc), -0.8 + ((0.2) * yLoc),  0.06, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.2, -0.8 + ((0.2) * yLoc), 0.04, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.2,  -0.8 + ((0.2) * yLoc) + 0.20, 0.04, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc),  -0.8 + ((0.2) * yLoc) + 0.20, 0.04, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc), -0.8 + ((0.2) * yLoc), 0.04, 1.0 )
+    ];
+
+    return vertices;
+}
+
+function checkIfPiece(xLoc, yLoc, color) {
+    // this function will check if there is a piece in the given space and that it is the opposite color
+    for (var i = 0; i++; i < 16){
+        if (blackPieces[i][location][1] == xLoc && blackPieces[i][location][0] == yLoc && blackPieces[i]["inPlay"] && blackPieces[i]["color"] != color){
+            // there is a piece in that location that can be attacked (black piece in that spot and you are white)
+            return 1;
+        }
+        else if (whitePieces[i][location][1] == xLoc && whitePieces[i][location][0] == yLoc && whitePieces[i]["inPlay"] && blackPieces[i]["color"] != color){
+            // there is a piece in that location that can be attacked (white piece in that spot and you are black)
+            return 1;
+        } 
+        else if (blackPieces[i][location][1] == xLoc && blackPieces[i][location][0] == yLoc && blackPieces[i]["inPlay"] && blackPieces[i]["color"] == color){
+            // there is a piece in that location, but it is the same color as your team (black piece in that spot and you are black)
+            return 2;
+        }
+        else if (whitePieces[i][location][1] == xLoc && whitePieces[i][location][0] == yLoc && whitePieces[i]["inPlay"] && blackPieces[i]["color"] == color){
+            // there is a piece in that location, but it is the same color as your team (white piece in that spot and you are white)
+            return 2;
+        }
+        else {
+            // there is no piece there
+            return 0;
+        }
+    }
+}
+
+function playBook(piece) {
+    // this function will calculate what spaces are avilable for the piece to move to
+    var xLoc = piece[location][1];
+    var yLoc = piece[location][0];
+    var pieceColor = piece[color]
+    var white = vec4(1.0, 1.0, 1.0, 1.0)
+    var black = vec4(0.0, 0.0, 0.0, 1.0)
+    
     //king
+    if (piece["name"] == "king" && piece["inPlay"]){
+
+    }
 
     //queen
 
@@ -258,6 +344,101 @@ function playBook() {
     //rook
 
     //pawn
+    if (piece["name"] == "pawn" && piece["inPlay"]){
+        if(pieceColor == white){
+            //check if pawn has been moved already and if there is no piece two spaces ahead
+            if (yLoc == 1 && checkIfPiece(xLoc, yLoc + 2, white) == 0){
+                // highlight move two forward for white piece
+                var movePawnVertices = highlightMoves(xLoc, yLoc + 2);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+
+            // if there is a piece diagonally to left and it is the opposite color
+            if (checkIfPiece(xLoc - 1, yLoc + 1, white) == 1){
+                var movePawnVertices = highlightMoves(xLoc - 1, yLoc + 1);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+
+            // if there is a piece diagonally to right and it is the opposite color
+            if (checkIfPiece(xLoc + 1, yLoc + 1, white) == 1){
+                var movePawnVertices = highlightMoves(xLoc + 1, yLoc + 1);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+
+            // if there are no piece one space ahead, move there
+            if (checkIfPiece(xLoc, yLoc + 1, white) == 0){
+                var movePawnVertices = highlightMoves(xLoc, yLoc + 1);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+        }
+
+        if(pieceColor == black){
+            //check if pawn has been moved already and if there is no piece two spaces ahead
+            if (yLoc == 6 && checkIfPiece(xLoc, yLoc - 2, black) == 0){
+                // highlight move two forward for black piece
+                var movePawnVertices = highlightMoves(xLoc, yLoc - 2);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+
+            // if there is a piece diagonally to left and it is the opposite color
+            if (checkIfPiece(xLoc - 1, yLoc - 1, black) == 1){
+                var movePawnVertices = highlightMoves(xLoc - 1, yLoc - 1);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+
+            // if there is a piece diagonally to right and it is the opposite color
+            if (checkIfPiece(xLoc + 1, yLoc - 1, black) == 1){
+                var movePawnVertices = highlightMoves(xLoc + 1, yLoc - 1);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+
+            // if there are no piece one space ahead, move there
+            if (checkIfPiece(xLoc, yLoc - 1, black) == 0){
+                var movePawnVertices = highlightMoves(xLoc, yLoc - 1);
+                quad( 1, 0, 3, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, movePawnVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+        }      
+    }
 }
 
 function createBoard()
@@ -283,21 +464,6 @@ function quad(a, b, c, d, vertices, color)
         points.push( vertices[indices[i]] );
         colors.push( color );
     }
-}
-
-function calculatePawnVertices(xLoc, yLoc){
-    var vertices = [
-        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 )
-    ];
-
-    return vertices;
 }
 
 function drawKing() {
@@ -469,6 +635,21 @@ function drawRook() {
     }
 }
 
+function calculatePawnVertices(xLoc, yLoc){
+    var vertices = [
+        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 )
+    ];
+
+    return vertices;
+}
+
 function drawPawn() {
     var pawnXLoc = 0;
     var pawnYLoc = 0;
@@ -517,22 +698,6 @@ function drawPieces() {
     drawKnight();
     drawRook();
     drawPawn();
-}
-
-// pause functions
-const sleep = async (milliseconds) => {
-    await new Promise(resolve => {
-        return setTimeout(resolve, milliseconds)
-    });
-};
-
-const testSleep = async () => {
-    for (let i = 0; i < 10; i++) {
-        await sleep(1000);
-        console.log(i);
-    }
-
-    console.log("The loop is finished :)");
 }
 
 function render()
