@@ -362,7 +362,9 @@ function drawRook() {
 }
 
 function drawPawn() {
-    
+
+
+
 }
 
 function drawPieces() {
