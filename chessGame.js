@@ -553,6 +553,24 @@ function playBook(piece) {
     }
 }
 
+function checkWin(){
+    // loop through white pieces in play to check white win
+
+        // if any black piece can attack the king in next play, "check" (checkIfPiece returns 1 for any pieces)
+
+            // if king cannot move to avoid attack, "checkmate" (no possible moves for king using playbook(king))
+
+            // or if black piece cannot attack attacking piece, "checkmate" (loop through black pieces to see if any share the location of the attacking piece)
+
+    // loop through black pieces in play to check black win
+
+        // if any black piece can attack the king in next play, "check" (checkIfPiece returns 1 for any pieces)
+
+            // if king cannot move to avoid attack, "checkmate" (no possible moves for king using playbook(king))
+
+            // or if white piece cannot attack attacking piece, "checkmate" (loop through white pieces to see if any share the location of the attacking piece)
+}
+
 function createBoard()
 {
     quad( 1, 0, 3, 2, boardVertices, vec4(0.5, 0.5, 0.5, 1.0) );
