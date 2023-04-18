@@ -3,61 +3,282 @@
 var canvas;
 var gl;
 
-var program;
+var NumVertices  = 36;
 
-var vertexColors = [
-    vec4( 0.0, 0.0, 0.0, 1.0 ),  // black
-    vec4( 1.0, 1.0, 1.0, 1.0 ),  // white
-    vec4( 1.0, 0.0, 0.0, 1.0 ),  // red
-    vec4( 1.0, 1.0, 0.0, 1.0 ),  // yellow
-    vec4( 0.0, 1.0, 0.0, 1.0 ),  // green
-    vec4( 0.0, 0.0, 1.0, 1.0 ),  // blue
-    vec4( 1.0, 0.0, 1.0, 1.0 ),  // magenta
-    vec4( 0.0, 1.0, 1.0, 1.0 )   // cyan
+var rotate = false;
+var rotateSpeed = 100.0;
+var angles = (Math.PI / 180) * rotateSpeed;
+var c = Math.cos( angles );
+var s = Math.sin( angles );
+var rxyz = mat4( 1.0,  0.0,  0.0, 0.0,
+    0.0,  c,    -s,  0.0,
+    0.0,  s,    c,   0.0,
+    0.0,  0.0,  0.0, 1.0 );
+
+var pm = mat4(1.0);
+
+var points = [];
+var boardPoints = [];
+var colors = [];
+
+var ctMatrix;
+var u_ctMatrixLoc;
+
+var a_vColorLoc;
+var a_vPositionLoc;
+var cBuffer, vBuffer;
+
+// for trackball
+var m_inc;
+var m_curquat;
+var m_mousex = 1;
+var m_mousey = 1;
+var trackballMove = false;
+
+var whitePieces = [
+    {name: "king",
+    location: (1, 4),
+    inPlay: true},
+    {name: "queen",
+    location: (1, 5),
+    inPlay: true},
+    {name: "bishop1",
+    location: (1, 6),
+    inPlay: true},
+    {name: "bishop2",
+    location: (1, 3),
+    inPlay: true},
+    {name: "knight1",
+    location: (1, 7),
+    inPlay: true},
+    {name: "knight2",
+    location: (1, 2),
+    inPlay: true},
+    {name: "rook1",
+    location: (1, 8),
+    inPlay: true},
+    {name: "rook2",
+    location: (1, 1),
+    inPlay: true},
+    {name: "pawn1",
+    location: (2, 1),
+    inPlay: true},
+    {name: "pawn2",
+    location: (2, 2),
+    inPlay: true},
+    {name: "pawn3",
+    location: (2, 3),
+    inPlay: true},
+    {name: "pawn4",
+    location: (2, 4),
+    inPlay: true},
+    {name: "pawn5",
+    location: (2, 5),
+    inPlay: true},
+    {name: "pawn6",
+    location: (2, 6),
+    inPlay: true},
+    {name: "pawn7",
+    location: (2, 7),
+    inPlay: true},
+    {name: "pawn8",
+    location: (2, 8),
+    inPlay: true},
 ];
 
-window.onload = init;
+var blackPieces = [
+    {name: "king",
+    location: (8, 4),
+    inPlay: true},
+    {name: "queen",
+    location: (8, 5),
+    inPlay: true},
+    {name: "bishop1",
+    location: (8, 6),
+    inPlay: true},
+    {name: "bishop2",
+    location: (8, 3),
+    inPlay: true},
+    {name: "knight1",
+    location: (8, 7),
+    inPlay: true},
+    {name: "knight2",
+    location: (8, 2),
+    inPlay: true},
+    {name: "rook1",
+    location: (8, 8),
+    inPlay: true},
+    {name: "rook2",
+    location: (8, 1),
+    inPlay: true},
+    {name: "pawn1",
+    location: (7, 1),
+    inPlay: true},
+    {name: "pawn2",
+    location: (7, 2),
+    inPlay: true},
+    {name: "pawn3",
+    location: (7, 3),
+    inPlay: true},
+    {name: "pawn4",
+    location: (7, 4),
+    inPlay: true},
+    {name: "pawn5",
+    location: (7, 5),
+    inPlay: true},
+    {name: "pawn6",
+    location: (7, 6),
+    inPlay: true},
+    {name: "pawn7",
+    location: (7, 7),
+    inPlay: true},
+    {name: "pawn8",
+    location: (7, 8),
+    inPlay: true},
+];
 
+var boardVertices = [
+                vec4( -0.7, -0.7,  0.05, 1.0 ),
+                vec4( -0.7,  0.7,  0.05, 1.0 ),
+                vec4(  0.7,  0.7,  0.05, 1.0 ),
+                vec4(  0.7, -0.7,  0.05, 1.0 ),
+                vec4( -0.7, -0.7, -0.05, 1.0 ),
+                vec4( -0.7,  0.7, -0.05, 1.0 ),
+                vec4(  0.7,  0.7, -0.05, 1.0 ),
+                vec4(  0.7, -0.7, -0.05, 1.0 )
+                ];
 
-function init() {
+var vertexColors = [
+                    [ 0.0, 0.0, 0.0, 1.0 ],  // black
+                    [ 1.0, 0.0, 0.0, 1.0 ],  // red
+                    [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
+                    [ 0.0, 1.0, 0.0, 1.0 ],  // green
+                    [ 0.0, 0.0, 1.0, 1.0 ],  // blue
+                    [ 1.0, 0.0, 1.0, 1.0 ],  // magenta
+                    [ 1.0, 1.0, 1.0, 1.0 ],  // white
+                    [ 0.0, 1.0, 1.0, 1.0 ]   // cyan
+                    ];
+
+// for trackball
+function mouseMotion( x,  y)
+{
+        var lastquat;
+        if (m_mousex != x || m_mousey != y)
+        {
+            lastquat = trackball(
+                  (2.0*m_mousex - canvas.width) / canvas.width,
+                  (canvas.height - 2.0*m_mousey) / canvas.height,
+                  (2.0*x - canvas.width) / canvas.width,
+                  (canvas.height - 2.0*y) / canvas.height);
+            m_curquat = add_quats(lastquat, m_curquat);
+            m_mousex = x;
+            m_mousey = y;
+        }
+}
+
+window.onload = function init()
+{
     canvas = document.getElementById( "gl-canvas" );
 
     gl = WebGLUtils.setupWebGL( canvas );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.5, 0.5, 0.5, 1.0 );
+    gl.clearColor( 0.8, 0.8, 0.8, 1.0 );
 
-    //
+    gl.enable(gl.DEPTH_TEST);
+
+    // for trackball
+    m_curquat = trackball(0, 0, 0, 0);
+
+    createBoard();
+ 
     //  Load shaders and initialize attribute buffers
-    //
-    program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer);
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(colorsArray), gl.STATIC_DRAW );
-    
-    var a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
-    gl.vertexAttribPointer(a_vColorLoc, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(a_vColorLoc);
+    cBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(colors), gl.STATIC_DRAW );
 
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer);
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(pointsArray), gl.STATIC_DRAW);
-    
-    var a_vPositionLoc = gl.getAttribLocation( program, "a_vPosition" );
-    gl.vertexAttribPointer( a_vPositionLoc, 4, gl.FLOAT, false, 0, 0);
-    gl.enableVertexAttribArray(a_vPositionLoc);
+    a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
+    gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( a_vColorLoc );
 
-    u_modelViewMatrixLoc = gl.getUniformLocation( program, "u_modelViewMatrix" );
-    u_projectionMatrixLoc = gl.getUniformLocation( program, "u_projectionMatrix" );
+    vBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(boardPoints), gl.STATIC_DRAW );
+
+    a_vPositionLoc = gl.getAttribLocation( program, "a_vPosition" );
+    gl.vertexAttribPointer( a_vPositionLoc, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( a_vPositionLoc );
+
+    u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
+
+    // for trackball
+    canvas.addEventListener("mousedown", function(event){
+        m_mousex = event.clientX - event.target.getBoundingClientRect().left;
+        m_mousey = event.clientY - event.target.getBoundingClientRect().top;
+        trackballMove = true;
+    });
+
+    // for trackball
+    canvas.addEventListener("mouseup", function(event){
+        trackballMove = false;
+    });
+
+    // for trackball
+    canvas.addEventListener("mousemove", function(event){
+      if (trackballMove) {
+        var x = event.clientX - event.target.getBoundingClientRect().left;
+        var y = event.clientY - event.target.getBoundingClientRect().top;
+        mouseMotion(x, y);
+      }
+    } );
+
+    document.getElementById("rotate").onclick = function(){
+        rotate = true;
+    };
 
     render();
+
 }
 
-function drawKing() {
+function playBook() {
+    //king
 
+    //queen
+
+    //bishop
+
+    //knight
+
+    //rook
+
+    //pawn
+}
+
+function createBoard()
+{
+    boardquad( 1, 0, 3, 2 );
+    boardquad( 2, 3, 7, 6 );
+    boardquad( 3, 0, 4, 7 );
+    boardquad( 6, 5, 1, 2 );
+    boardquad( 4, 5, 6, 7 );
+    boardquad( 5, 4, 0, 1 );
+
+    //to do: add grid texture to one face of the board to make it 8x8
+
+}
+
+function boardquad(a, b, c, d)
+{
+    var indices = [ a, b, c, a, c, d ];
+
+    for ( var i = 0; i < indices.length; ++i ) {
+        boardPoints.push( boardVertices[indices[i]] );
+        colors.push( vec4(0.5, 0.5, 0.5, 1.0) );
+    }
 }
 
 function drawQueen() {
@@ -84,36 +305,42 @@ function drawPieces() {
 
 }
 
-function drawBoard() {
+// pause functions
+const sleep = async (milliseconds) => {
+    await new Promise(resolve => {
+        return setTimeout(resolve, milliseconds)
+    });
+};
 
+const testSleep = async () => {
+    for (let i = 0; i < 10; i++) {
+        await sleep(1000);
+        console.log(i);
+    }
+
+    console.log("The loop is finished :)");
 }
 
-function setUpBoard() {
+function render()
+{
+    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    
+    // for trackball
+    m_inc = build_rotmatrix(m_curquat);
 
-}
-
-function playBook() {
-    //king
-
-    //queen
-
-    //bishop
-
-    //knight
-
-    //rook
-
-    //pawn
-}
-
-var render = function() {
-    gl.clear( gl.COLOR_BUFFER_BIT);
-
-    modelViewMatrix = lookAt(eye, at , up);
-    projectionMatrix = perspective(fovy, aspect, near, far);
-
-    gl.uniformMatrix4fv( u_modelViewMatrixLoc, false, flatten(modelViewMatrix) );
-    gl.uniformMatrix4fv( u_projectionMatrixLoc, false, flatten(projectionMatrix) );
-    gl.drawArrays( gl.TRIANGLES, 0, numVertices );
-    requestAnimFrame(render);
+    //rotate board on click
+    if (rotate) {
+        pm = mult(rxyz, pm);
+        ctMatrix = mult(ortho(-1, 1, -1, 1, -1, 1), pm);
+        ctMatrix = mult(ctMatrix, m_inc);
+        rotate = false;
+    }
+    // orthogonal projection matrix * trackball rotation matrix
+    else {
+        ctMatrix = mult(ortho(-1, 1, -1, 1, -1, 1), m_inc);
+    }
+    gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix));
+    
+    gl.drawArrays( gl.TRIANGLES, 0, NumVertices );
+    requestAnimFrame( render );
 }
