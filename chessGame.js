@@ -333,11 +333,84 @@ function playBook(piece) {
     //king
     if (piece["name"] == "king" && piece["inPlay"]){
 
-    }
+            if(checkIfPiece(xLoc - 1, yLoc - 1) != 2){
+                var moveKingVertices = highlightMoves(xLoc - 1, yLoc - 1);
+                quad( 1, 0, 3, 2, moveKingVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKingVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKingVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKingVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc - 1, yLoc + 1) != 2){
+                var moveKnightVertices = highlightMoves(xLoc - 1, yLoc + 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc + 1, yLoc + 1) != 2){
+                var moveKnightVertices = highlightMoves(xLoc + 1, yLoc + 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc + 1, yLoc - 1) != 2){
+                var moveKnightVertices = highlightMoves(xLoc + 1, yLoc - 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc - 1, yLoc) != 2){
+                var moveKnightVertices = highlightMoves(xLoc - 1, yLoc);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc + 1, yLoc) != 2){
+                var moveKnightVertices = highlightMoves(xLoc + 1, yLoc);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc, yLoc+1) != 2){
+                var moveKnightVertices = highlightMoves(xLoc, yLoc + 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+            if(checkIfPiece(xLoc, yLoc-1) != 2){
+                var moveKnightVertices = highlightMoves(xLoc, yLoc - 1);
+                quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 3, 0, 4, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 6, 5, 1, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+            }
+        
+        }
 
     //queen
     if (piece["name"] == "queen" && piece["inPlay"]){
-
+        
     }
 
     //bishop
@@ -468,7 +541,7 @@ function playBook(piece) {
         }
     }
 
-    //rook
+    //rook  
     if (piece["name"] == "rook" && piece["inPlay"]){
 
     }
@@ -596,12 +669,83 @@ function quad(a, b, c, d, vertices, color)
     }
 }
 
+//------Emelie------
+function calculateKingVertices(xLoc, yLoc) {
+    var vertices = [
+        //base square
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+
+
+        //triangle
+        vec4( -0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.15,  0.35, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.15,  0.35, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.10,  0.35, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.05,  0.35, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.25, 1.0 )
+
+    ];
+
+    return vertices;
+
+}
+
+//-----Emelie-------
 function drawKing() {
+    var kingXLoc = 0;
+    var kingYLoc = 0;
+    var kingVertices;
     if (whitePieces[0]["inPlay"]){
+        kingXLoc = whitePieces[0]["location"][1];
+        kingYLoc = whitePieces[0]["location"][0];
+        kingVertices = calculateKingVertices(kingXLoc, kingYLoc);
+
+        quad( 1, 0, 3, 2, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+
+        quad( 9, 8, 11, 10, kingVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 10, 11, 15, 14, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 11, 8, 12, 15, kingVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 14, 13, 9, 10, kingVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 12, 13, 14, 15, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 13, 12, 8, 9, kingVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+
 
     }
 
     if (blackPieces[0]["inPlay"]){
+        kingXLoc = blackPieces[0]["location"][1];
+        kingYLoc = blackPieces[0]["location"][0];
+        kingVertices = calculateKingVertices(kingXLoc, kingYLoc);
+
+        quad( 1, 0, 3, 2, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+
+        quad( 9, 8, 11, 10, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 10, 11, 15, 14, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 11, 8, 12, 15, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 14, 13, 9, 10, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 12, 13, 14, 15, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 13, 12, 8, 9, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+
+        
 
     }
 }
@@ -616,20 +760,121 @@ function drawQueen() {
     }
 }
 
+//------Emelie------
+function calculateBishopVertices(xLoc, yLoc) {
+    var vertices = [
+    //base square
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+
+    //triangle
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.10,  0.25, 1.0 ),
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.10,  0.25, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 ),
+    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 )
+    ];
+
+    return vertices;
+
+}
+
+//------Emelie------
 function drawBishop() {
+    var bishopXLoc = 0;
+    var bishopYLoc = 0;
+    var bishopVertices;
+
     if (whitePieces[2]["inPlay"]){
+        bishopXLoc = whitePieces[2]["location"][1];
+        bishopYLoc = whitePieces[2]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+
+        quad( 1, 0, 3, 2, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+
+        quad( 9, 8, 11, 10, bishopVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 10, 11, 15, 14, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 11, 8, 12, 15, bishopVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 14, 13, 9, 10, bishopVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 12, 13, 14, 15, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 13, 12, 8, 9, bishopVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
 
     } 
 
     if (whitePieces[3]["inPlay"]){
+        bishopXLoc = whitePieces[3]["location"][1];
+        bishopYLoc = whitePieces[3]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+
+        quad( 1, 0, 3, 2, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+
+        quad( 9, 8, 11, 10, bishopVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 10, 11, 15, 14, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 11, 8, 12, 15, bishopVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 14, 13, 9, 10, bishopVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 12, 13, 14, 15, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 13, 12, 8, 9, bishopVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
 
     }
 
     if (blackPieces[2]["inPlay"]){
+        bishopXLoc = blackPieces[2]["location"][1];
+        bishopYLoc = blackPieces[2]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+
+        quad( 1, 0, 3, 2, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+
+        quad( 9, 8, 11, 10, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 10, 11, 15, 14, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 11, 8, 12, 15, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 14, 13, 9, 10, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 12, 13, 14, 15, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 13, 12, 8, 9, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
     }
 
     if (blackPieces[3]["inPlay"]){
+        bishopXLoc = blackPieces[3]["location"][1];
+        bishopYLoc = blackPieces[3]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+
+        quad( 1, 0, 3, 2, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+
+        quad( 9, 8, 11, 10, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 10, 11, 15, 14, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 11, 8, 12, 15, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 14, 13, 9, 10, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 12, 13, 14, 15, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 13, 12, 8, 9, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
     }
 }
@@ -736,6 +981,7 @@ function drawKnight() {
         quad( 6, 5, 1, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 4, 5, 6, 7, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 5, 4, 0, 1, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        
 
         quad( 9, 8, 11, 10, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 10, 11, 15, 14, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
