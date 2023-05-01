@@ -225,9 +225,9 @@ function movePiece(){
 
 			for (var k=0; k<16; k++){
 				
-				if (whitePieces[k]["name"] == pName){
-			
-					possibleMoves = playBook(whitePieces[k]);
+
+				if (whitePieces[k]["name"] == pName){			
+					var possibleMoves = playBook(whitePieces[k]);
 					var includes = false;
 					
 					for (var p=0; p<possibleMoves.length; p++){
@@ -248,6 +248,7 @@ function movePiece(){
 						}
 						whitePieces[i]["location"] = [pRow, pCol];
 						turn = "black";
+
                         previousTurn = "white";
                         rotate = true;
 						return true;
@@ -293,6 +294,7 @@ function movePiece(){
 			}
 		}
 		console.log("MOVE PIECE FALSE");
+
         previousTurn = turn;
 	return false;
 }
