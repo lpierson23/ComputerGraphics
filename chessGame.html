@@ -65,6 +65,8 @@ main()
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 <img id = "texImage" src = "Chess_Board.png" hidden></img>
+<img id = "texImage2" src = "whiteMarble.png" hidden></img>
+<img id = "texImage3" src = "blackMarble.png" hidden></img>
 
 
 <div>
@@ -88,7 +90,7 @@ Oops ... your browser doesn't support the HTML5 canvas element
 </br>
 </br>
 Chess Piece-------Row-------Col</br>
-<select name="chess_piece" id="id_chess_piece" multiple>
+<select name="chess_piece" id="id_chess_piece">
   <option value="king">King</option>
   <option value="queen">Queen</option>
   <option value="bishop1">Bishop1</option>
@@ -108,7 +110,7 @@ Chess Piece-------Row-------Col</br>
 </select>
 ---------
 
-<select name="row" id="id_row" multiple>
+<select name="row" id="id_row">
   <option value=0>1</option>
   <option value=1>2</option>
   <option value=2>3</option>
@@ -120,7 +122,7 @@ Chess Piece-------Row-------Col</br>
 </select>
 
 -------
-<select name="col" id="id_col" multiple>
+<select name="col" id="id_col">
   <option value=0>1</option>
   <option value=1>2</option>
   <option value=2>3</option>

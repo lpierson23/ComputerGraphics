@@ -210,20 +210,17 @@ function movePiece(){
 	var i;
 
 		if (turn === "white"){
-
+			console.log("moving WHITE ");
+			console.log("pRow "+pRow+"pCol "+pCol);
 
 			for (var k=0; k<16; k++){
-
+				
 				if (whitePieces[k]["name"] === pName){
+			
 					var possibleMoves = playBook(whitePieces[k]);
-					console.log("movePiece func");
-					console.log(whitePieces[k]["name"]);
-					console.log(pRow);
-					console.log(pCol);
-					console.log(possibleMoves);
-					console.log(vec2(pRow,pCol));
-					
 					var includes = false;
+					console.log("possible moves");
+					console.log(possibleMoves);
 					
 					for (var p=0; p<possibleMoves.length; p++){
 						if (possibleMoves[p][0] == pRow){
@@ -239,14 +236,12 @@ function movePiece(){
 						for (var p=0; p<whitePieces.length; p++){
 							if (whitePieces[p]["name"] == pName){
 								var i = p;
-								console.log("i = "+i);
 								break;
 							}
 						}
 						
 						whitePieces[i]["location"] = [pRow, pCol];
 						turn = "black";
-						console.log("TRUE");
 						return true;
 					}
 					
@@ -254,7 +249,7 @@ function movePiece(){
 			}
 		}
 		else{ // black's turn
-			
+			console.log("moving BLACK ");
 			for (var k=0; k<16; k++){
 				if (blackPieces[k]["name"] === pName){
 					possibleMoves = playBook(blackPieces[k]);
@@ -286,7 +281,7 @@ function movePiece(){
 				}	
 			}
 		}
-		console.log("FALSE");
+		console.log("MOVE PIECE FALSE");
 	return false;
 
 	  
@@ -347,7 +342,7 @@ window.onload = function init()
 
     // for trackball
     m_curquat = trackball(0, 0, 0, 0);
-
+	points = [];
     createBoard();
     drawPieces();
  
@@ -401,7 +396,22 @@ window.onload = function init()
     }
     boardTexture.image.src = "Chess_Board.png";
     //*/
-
+	/*
+	whiteTexture = gl.createTexture();
+    whiteTexture.image = new Image();
+    whiteTexture.image.onload = function() {
+        configureTexture( whiteTexture);
+    }
+    whiteTexture.image.src = "whiteMarble.png";
+	
+	blackTexture = gl.createTexture();
+    blackTexture.image = new Image();
+    blackTexture.image.onload = function() {
+        configureTexture( blackTexture);
+    }
+    blackTexture.image.src = "blackMarble.png";
+*/
+	
     // for trackball
     canvas.addEventListener("mousedown", function(event){
         m_mousex = event.clientX - event.target.getBoundingClientRect().left;
@@ -433,12 +443,11 @@ window.onload = function init()
 	
 
 	document.getElementById("submit").onclick = function(){
-		console.log("CLICK");
 		var truth = movePiece( );
-		console.log("TRUTH");
 		//render( boardTexture);
-		 gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		drawPieces();
+		init();
+		 //gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		//drawPieces();
 	}
 
 }
@@ -473,7 +482,6 @@ function checkIfPiece(xLoc, yLoc, color) {
 
     for (var i = 0; i < 16; i++){
 		if (colorWhite == true){ // you are white
-			console.log("HERE WHITE");
        		if (blackPieces[i]["location"][1] == xLoc && blackPieces[i]["location"][0] == yLoc && blackPieces[i]["inPlay"]){
            		 // there is a piece in that location that can be attacked (black piece in that spot and you are white)
             	return 1;
@@ -485,7 +493,6 @@ function checkIfPiece(xLoc, yLoc, color) {
 
 		}
 		else{ // you are black
-			console.log("HERE BLACK");
        	 	if (whitePieces[i]["location"][1] == xLoc && whitePieces[i]["location"][0] == yLoc && whitePieces[i]["inPlay"]){
             	// there is a piece in that location that can be attacked (white piece in that spot and you are black)
            	 	return 1;
@@ -497,25 +504,35 @@ function checkIfPiece(xLoc, yLoc, color) {
 
 		}
     }
-	console.log("RETURN 0");
 	return 0;
 	
 }
 
 function playBook(piece) {
 	
+	
+	
 	var possibleMoves = [];
     // this function will calculate what spaces are avilable for the piece to move to
     var xLoc = piece["location"][1];
     var yLoc = piece["location"][0];
     var pieceColor = piece["color"];
-	console.log(pieceColor);
     var white = vec4(1.0, 1.0, 1.0, 1.0);
     var black = vec4(0.0, 0.0, 0.0, 1.0);
+	var j;
+	var k;
+	
+	var colorWhite = true;
+	for (var h=0;h<4;h++){
+		if (pieceColor[h] != white[h]){
+			colorWhite = false;
+		}
+	}
     
     //king
-    if (piece["name"] == "king" && piece["inPlay"]){
-        if(checkIfPiece(xLoc - 1, yLoc - 1) != 2){
+    if (piece["name"] === "king" && piece["inPlay"]){
+        if(checkIfPiece(xLoc - 1, yLoc - 1, pieceColor) != 2){
+			possibleMoves.push([yLoc-1, xLoc-1]);
             var moveKingVertices = highlightMoves(xLoc - 1, yLoc - 1);
             quad( 1, 0, 3, 2, moveKingVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKingVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -524,7 +541,8 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc - 1, yLoc + 1) != 2){
+        if(checkIfPiece(xLoc - 1, yLoc + 1, pieceColor) != 2){
+			possibleMoves.push([yLoc+1, xLoc-1]);
             var moveKnightVertices = highlightMoves(xLoc - 1, yLoc + 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -533,7 +551,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc + 1, yLoc + 1) != 2){
+
+        if(checkIfPiece(xLoc + 1, yLoc + 1, pieceColor) != 2){
+			possibleMoves.push([yLoc+1, xLoc+1]);
+
             var moveKnightVertices = highlightMoves(xLoc + 1, yLoc + 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -542,7 +563,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc + 1, yLoc - 1) != 2){
+
+        if(checkIfPiece(xLoc + 1, yLoc - 1, pieceColor) != 2){
+			possibleMoves.push([yLoc+1, xLoc-1]);
+
             var moveKnightVertices = highlightMoves(xLoc + 1, yLoc - 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -551,7 +575,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc - 1, yLoc) != 2){
+
+        if(checkIfPiece(xLoc - 1, yLoc, pieceColor) != 2){
+			possibleMoves.push([yLoc, xLoc-1]);
+
             var moveKnightVertices = highlightMoves(xLoc - 1, yLoc);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -560,7 +587,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc + 1, yLoc) != 2){
+
+        if(checkIfPiece(xLoc + 1, yLoc, pieceColor) != 2){
+			possibleMoves.push([yLoc, xLoc+1]);
+
             var moveKnightVertices = highlightMoves(xLoc + 1, yLoc);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -569,7 +599,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc, yLoc+1) != 2){
+
+        if(checkIfPiece(xLoc, yLoc+1, pieceColor) != 2){
+			possibleMoves.push([yLoc+1, xLoc]);
+
             var moveKnightVertices = highlightMoves(xLoc, yLoc + 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -578,7 +611,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
-        if(checkIfPiece(xLoc, yLoc-1) != 2){
+
+        if(checkIfPiece(xLoc, yLoc-1, pieceColor) != 2){
+			possibleMoves.push([yLoc-1, xLoc]);
+
             var moveKnightVertices = highlightMoves(xLoc, yLoc - 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -590,7 +626,7 @@ function playBook(piece) {
     }
 
     //queen
-    if (piece["name"] == "queen" && piece["inPlay"]){
+    if (piece["name"] === "queen" && piece["inPlay"]){
 		// same as bishop and rook combined!
 		
         // if (pieceColor == white){
@@ -600,7 +636,7 @@ function playBook(piece) {
 			
  			// RIGHT
  			while (j<8){
- 				if(checkIfPiece(j, yLoc) != 2){
+ 				if(checkIfPiece(j, yLoc, pieceColor) != 2){
 					possibleMoves.push([yLoc, j]); // switch bc Row, Col = y,x 
                   	var moveRookVertices = highlightMoves(j, yLoc);
                   	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -619,7 +655,7 @@ function playBook(piece) {
  			j = xLoc-1;
  			// LEFT
  			while (j>=0){
- 				if(checkIfPiece(j, yLoc) != 2){
+ 				if(checkIfPiece(j, yLoc, pieceColor) != 2){
 					possibleMoves.push([yLoc, j]);
                   	var moveRookVertices = highlightMoves(j, yLoc);
                   	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -639,7 +675,7 @@ function playBook(piece) {
  			k = yLoc+1;
  			// UP
  			while (k<8){
- 				if(checkIfPiece(xLoc, k) != 2){
+ 				if(checkIfPiece(xLoc, k, pieceColor) != 2){
 					possibleMoves.push([k, xLoc]);
                   	var moveRookVertices = highlightMoves(xLoc, k);
                   	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -658,7 +694,7 @@ function playBook(piece) {
  			k = yLoc-1;
  			// DOWN
  			while (k>=0){
- 				if(checkIfPiece(xLoc, k) != 2){
+ 				if(checkIfPiece(xLoc, k, pieceColor) != 2){
 					possibleMoves.push([k, xLoc]);
                   	var moveRookVertices = highlightMoves(xLoc, k);
                   	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -677,15 +713,15 @@ function playBook(piece) {
      }
 
     //bishop
-    if (piece["name"] == "bishop" && piece["inPlay"]){
+    if (piece["name"].startsWith("bishop") && piece["inPlay"]){
 
     }
 
     //knight
-    if (piece["name"] == "knight" && piece["inPlay"]){
-        if (pieceColor == white){
+    if (piece["name"].startsWith("knight") && piece["inPlay"]){
+       // if (pieceColor == white){
             // suggest if there is no piece in the spot or a piece of the other color on left
-            if(checkIfPiece(xLoc - 1, yLoc + 2) != 2){
+            if(checkIfPiece(xLoc - 1, yLoc + 2, pieceColor) != 2){
                 //highlight ending square
 				possibleMoves.push([yLoc+2, xLoc-1]);
                 var moveKnightVertices = highlightMoves(xLoc - 1, yLoc + 2);
@@ -715,7 +751,7 @@ function playBook(piece) {
             }
 
             // suggest if there is no piece in the spot or a piece of the other color on right
-            if(checkIfPiece(xLoc + 1, yLoc + 2) != 2){
+            if(checkIfPiece(xLoc + 1, yLoc + 2,pieceColor) != 2){
                 //highlight ending square
 				possibleMoves.push([yLoc+2, xLoc+1]);
                 var moveKnightVertices = highlightMoves(xLoc + 1, yLoc + 2);
@@ -743,11 +779,11 @@ function playBook(piece) {
                 quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
                 quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
             }
-        }
+       // }
 
-        if (pieceColor == black){
+      //  if (pieceColor == black){
             // suggest if there is no piece in the spot or a piece of the other color on left
-            if(checkIfPiece(xLoc - 1, yLoc - 2) != 2){
+            if(checkIfPiece(xLoc - 1, yLoc - 2, pieceColor) != 2){
                 //highlight ending square
 				possibleMoves.push([yLoc-2, xLoc-1]);
                 var moveKnightVertices = highlightMoves(xLoc - 1, yLoc - 2);
@@ -777,7 +813,7 @@ function playBook(piece) {
             }
 
             // suggest if there is no piece in the spot or a piece of the other color on right
-            if(checkIfPiece(xLoc + 1, yLoc - 2) != 2){
+            if(checkIfPiece(xLoc + 1, yLoc - 2, pieceColor) != 2){
                 //highlight ending square
 				possibleMoves.push([ yLoc-2, xLoc+1]);
                 var moveKnightVertices = highlightMoves(xLoc + 1, yLoc - 2);
@@ -805,11 +841,11 @@ function playBook(piece) {
                 quad( 4, 5, 6, 7, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
                 quad( 5, 4, 0, 1, moveKnightVertices, vec4(0.5, 0.5, 0.0, 1.0) );
             }
-        }
+       // }
     }
 
     //rook
-    if (piece["name"] == "rook" && piece["inPlay"]){
+    if (piece["name"].startsWith("rook") && piece["inPlay"]){
        // if (pieceColor == white){
             // suggest if there is no piece in the spot or a piece of the other color on right
 			j = xLoc+1;
@@ -817,7 +853,7 @@ function playBook(piece) {
 			
 			// RIGHT
 			while (j<8){
-				if(checkIfPiece(j, yLoc) != 2){
+				if(checkIfPiece(j, yLoc, pieceColor) != 2){
 					possibleMoves.push([yLoc, j]);
                  	var moveRookVertices = highlightMoves(j, yLoc);
                  	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -836,7 +872,7 @@ function playBook(piece) {
 			j = xLoc-1;
 			// LEFT
 			while (j>=0){
-				if(checkIfPiece(j, yLoc) != 2){
+				if(checkIfPiece(j, yLoc, pieceColor) != 2){
 					possibleMoves.push([yLoc, j]);
                  	var moveRookVertices = highlightMoves(j, yLoc);
                  	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -856,7 +892,7 @@ function playBook(piece) {
 			k = yLoc+1;
 			// UP
 			while (k<8){
-				if(checkIfPiece(xLoc, k) != 2){
+				if(checkIfPiece(xLoc, k, pieceColor) != 2){
 					possibleMoves.push([k, xLoc]);
                  	var moveRookVertices = highlightMoves(xLoc, k);
                  	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -875,7 +911,7 @@ function playBook(piece) {
 			k = yLoc-1;
 			// DOWN
 			while (k>=0){
-				if(checkIfPiece(xLoc, k) != 2){
+				if(checkIfPiece(xLoc, k, pieceColor) != 2){
 					possibleMoves.push([k, xLoc]);
                  	var moveRookVertices = highlightMoves(xLoc, k);
                  	quad( 1, 0, 3, 2, moveRookVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -895,20 +931,11 @@ function playBook(piece) {
 
     //pawn
     if (piece["name"].startsWith("pawn") && piece["inPlay"]){
-		var colorWhite = true;
-		for (var h=0;h<4;h++){
-			if (pieceColor[h] != white[h]){
-				colorWhite = false;
-			}
-		}
+
 		
         if(colorWhite){
-			console.log("playbook func pawn");
-            console.log("check");
-			console.log(checkIfPiece(xLoc, yLoc+2,white));
             //check if pawn has been moved already and if there is no piece two spaces ahead
             if (yLoc == 1 && checkIfPiece(xLoc, yLoc + 2, white) == 0){
-				console.log("HERE?");
                 // highlight move two forward for white piece
 				possibleMoves.push([yLoc+2, xLoc]);
                 var movePawnVertices = highlightMoves(xLoc, yLoc + 2);
@@ -1560,9 +1587,7 @@ function drawPawn() {
         }
         if (blackPieces[i]["inPlay"]){
             pawnXLoc = blackPieces[i]["location"][1];
-            console.log(pawnXLoc);
             pawnYLoc = blackPieces[i]["location"][0];
-            console.log(pawnYLoc);
 
             pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
 
