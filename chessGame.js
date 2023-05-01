@@ -10,20 +10,11 @@ var done = false;
 var NumVertices  = 36;
 
 var rotate = false;
-var rotateSpeed = 100.0;
-var angles = (Math.PI / 180) * rotateSpeed;
-var c = Math.cos( angles );
-var s = Math.sin( angles );
-var rxyz = mat4( 1.0,  0.0,  0.0, 0.0,
-    0.0,  c,    -s,  0.0,
-    0.0,  s,    c,   0.0,
-    0.0,  0.0,  0.0, 1.0 );
 
-var pm = mat4(1.0);
+var theta = 0.0;
+var u_thetaLoc;
 
 var points = [];
-var boardPoints = [];
-var pawnPoints = [];
 var colors = [];
 var texCoordsArray = [];
 
@@ -436,6 +427,8 @@ window.onload = function init()
         rotate = true;
     };
 
+    u_thetaLoc = gl.getUniformLocation(program, "u_theta");
+
     render( boardTexture);
 	
 
@@ -447,7 +440,6 @@ window.onload = function init()
 		 gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		drawPieces();
 	}
-	
 
 }
 
@@ -1020,6 +1012,23 @@ function playBook(piece) {
 }
 
 
+function checkWin(){
+    // loop through white pieces in play to check white win
+
+        // if any black piece can attack the king in next play, "check" (checkIfPiece returns 1 for any pieces)
+
+            // if king cannot move to avoid attack, "checkmate" (no possible moves for king using playbook(king))
+
+            // or if black piece cannot attack attacking piece, "checkmate" (loop through black pieces to see if any share the location of the attacking piece)
+
+    // loop through black pieces in play to check black win
+
+        // if any black piece can attack the king in next play, "check" (checkIfPiece returns 1 for any pieces)
+
+            // if king cannot move to avoid attack, "checkmate" (no possible moves for king using playbook(king))
+
+            // or if white piece cannot attack attacking piece, "checkmate" (loop through white pieces to see if any share the location of the attacking piece)
+}
 
 function createBoard()
 {
@@ -1506,9 +1515,8 @@ function render( texture )
 	//console.log("CHECKPOINT 1");
     //rotate board on click
     if (rotate) {
-        pm = mult(rxyz, pm);
-        ctMatrix = mult(ortho(-1, 1, -1, 1, -1, 1), pm);
-        ctMatrix = mult(ctMatrix, m_inc);
+        theta += 3.14; //180 degrees == 3.14 radians
+        gl.uniform1f(u_thetaLoc, theta);
         rotate = false;
     }
     // orthogonal projection matrix * trackball rotation matrix
