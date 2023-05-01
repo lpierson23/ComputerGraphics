@@ -28,7 +28,7 @@ void main()
 
   gl_Position = u_ctMatrix * gl_Position;
   v_fColor = a_vColor;
-   v_fTextureCoord = a_vTextureCoord;
+  v_fTextureCoord = a_vTextureCoord;
 }
 </script>
 
@@ -61,6 +61,7 @@ main()
 </head>
 
 <body>
+<h1 id="whosTurn"></h1>
 <canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
@@ -88,7 +89,7 @@ Oops ... your browser doesn't support the HTML5 canvas element
 </br>
 </br>
 Chess Piece-------Row-------Col</br>
-<select name="chess_piece" id="id_chess_piece" multiple>
+<select name="chess_piece" id="id_chess_piece">
   <option value="king">King</option>
   <option value="queen">Queen</option>
   <option value="bishop1">Bishop1</option>
@@ -108,7 +109,7 @@ Chess Piece-------Row-------Col</br>
 </select>
 ---------
 
-<select name="row" id="id_row" multiple>
+<select name="row" id="id_row">
   <option value=0>1</option>
   <option value=1>2</option>
   <option value=2>3</option>
@@ -120,7 +121,7 @@ Chess Piece-------Row-------Col</br>
 </select>
 
 -------
-<select name="col" id="id_col" multiple>
+<select name="col" id="id_col">
   <option value=0>1</option>
   <option value=1>2</option>
   <option value=2>3</option>
@@ -131,10 +132,7 @@ Chess Piece-------Row-------Col</br>
   <option value=7>8</option>
 </select>
 <button id = "submit">Submit</button>
-
-
-
-
+<button id = "moves">Check Moves</button>
 
 </body>
 </html>
