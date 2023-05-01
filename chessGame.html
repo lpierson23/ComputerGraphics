@@ -28,7 +28,7 @@ void main()
 
   gl_Position = u_ctMatrix * gl_Position;
   v_fColor = a_vColor;
-   v_fTextureCoord = a_vTextureCoord;
+  v_fTextureCoord = a_vTextureCoord;
 }
 </script>
 
@@ -61,6 +61,7 @@ main()
 </head>
 
 <body>
+<h1 id="whosTurn"></h1>
 <canvas id="gl-canvas" width="512" height="512">
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
@@ -133,10 +134,7 @@ Chess Piece-------Row-------Col</br>
   <option value=7>8</option>
 </select>
 <button id = "submit">Submit</button>
-
-
-
-
+<button id = "moves">Check Moves</button>
 
 </body>
 </html>
