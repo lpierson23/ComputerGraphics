@@ -551,8 +551,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
+
         if(checkIfPiece(xLoc + 1, yLoc + 1, pieceColor) != 2){
 			possibleMoves.push([yLoc+1, xLoc+1]);
+
             var moveKnightVertices = highlightMoves(xLoc + 1, yLoc + 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -561,8 +563,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
+
         if(checkIfPiece(xLoc + 1, yLoc - 1, pieceColor) != 2){
 			possibleMoves.push([yLoc+1, xLoc-1]);
+
             var moveKnightVertices = highlightMoves(xLoc + 1, yLoc - 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -571,8 +575,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
+
         if(checkIfPiece(xLoc - 1, yLoc, pieceColor) != 2){
 			possibleMoves.push([yLoc, xLoc-1]);
+
             var moveKnightVertices = highlightMoves(xLoc - 1, yLoc);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -581,8 +587,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
+
         if(checkIfPiece(xLoc + 1, yLoc, pieceColor) != 2){
 			possibleMoves.push([yLoc, xLoc+1]);
+
             var moveKnightVertices = highlightMoves(xLoc + 1, yLoc);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -591,8 +599,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
+
         if(checkIfPiece(xLoc, yLoc+1, pieceColor) != 2){
 			possibleMoves.push([yLoc+1, xLoc]);
+
             var moveKnightVertices = highlightMoves(xLoc, yLoc + 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -601,8 +611,10 @@ function playBook(piece) {
             quad( 4, 5, 6, 7, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 5, 4, 0, 1, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
         }
+
         if(checkIfPiece(xLoc, yLoc-1, pieceColor) != 2){
 			possibleMoves.push([yLoc-1, xLoc]);
+
             var moveKnightVertices = highlightMoves(xLoc, yLoc - 1);
             quad( 1, 0, 3, 2, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, moveKnightVertices, vec4(1.0, 1.0, 0.0, 1.0) );
