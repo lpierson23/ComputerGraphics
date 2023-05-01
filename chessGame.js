@@ -1034,12 +1034,12 @@ function drawQueen() {
         queenVertices = calculateQueenVertices(queenXLoc, queenYLoc);
 
         
-        quad( 1, 0, 3, 2, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 2, 3, 7, 6, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 3, 0, 4, 7, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 6, 5, 1, 2, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 4, 5, 6, 7, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 5, 4, 0, 1, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 1, 0, 3, 2, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
 
     }
 
@@ -1048,12 +1048,12 @@ function drawQueen() {
 		queenYLoc = blackPieces[1]["location"][0];
         queenVertices = calculateQueenVertices(queenXLoc, queenYLoc);
 
-        quad( 1, 0, 3, 2, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 2, 3, 7, 6, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 3, 0, 4, 7, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 6, 5, 1, 2, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 4, 5, 6, 7, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 5, 4, 0, 1, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 1, 0, 3, 2, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
     }
 }
 
@@ -1121,12 +1121,12 @@ function drawRook() {
         rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
 
         
-        quad( 1, 0, 3, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 2, 3, 7, 6, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 3, 0, 4, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 6, 5, 1, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 4, 5, 6, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 5, 4, 0, 1, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 1, 0, 3, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
     } 
 
     if (whitePieces[7]["inPlay"]){
@@ -1135,12 +1135,12 @@ function drawRook() {
         rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
 
         
-        quad( 1, 0, 3, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 2, 3, 7, 6, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 3, 0, 4, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 6, 5, 1, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 4, 5, 6, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-        quad( 5, 4, 0, 1, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 1, 0, 3, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 2, 3, 7, 6, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 3, 0, 4, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 6, 5, 1, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 4, 5, 6, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 5, 4, 0, 1, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
 
     }
 
@@ -1150,12 +1150,12 @@ function drawRook() {
 
         rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
 
-        quad( 1, 0, 3, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 2, 3, 7, 6, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 3, 0, 4, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 6, 5, 1, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 4, 5, 6, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 5, 4, 0, 1, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 1, 0, 3, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
 
     }
 
@@ -1165,12 +1165,12 @@ function drawRook() {
 
         rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
 
-        quad( 1, 0, 3, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 2, 3, 7, 6, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 3, 0, 4, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 6, 5, 1, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 4, 5, 6, 7, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-        quad( 5, 4, 0, 1, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        quad( 1, 0, 3, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 2, 3, 7, 6, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 3, 0, 4, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 6, 5, 1, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 4, 5, 6, 7, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+        quad( 5, 4, 0, 1, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
     }
 }
 
@@ -1203,12 +1203,12 @@ function drawPawn() {
             pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
             //console.log(pawnVertices);
             
-            quad( 1, 0, 3, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 2, 3, 7, 6, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 3, 0, 4, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 6, 5, 1, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 4, 5, 6, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
-            quad( 5, 4, 0, 1, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 1, 0, 3, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 2, 3, 7, 6, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 3, 0, 4, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 6, 5, 1, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 4, 5, 6, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 5, 4, 0, 1, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
 
         }
         if (blackPieces[i]["inPlay"]){
@@ -1219,12 +1219,12 @@ function drawPawn() {
 
             pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
 
-            quad( 1, 0, 3, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 2, 3, 7, 6, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 3, 0, 4, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 6, 5, 1, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 4, 5, 6, 7, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-            quad( 5, 4, 0, 1, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+            quad( 1, 0, 3, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 2, 3, 7, 6, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 3, 0, 4, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 6, 5, 1, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 4, 5, 6, 7, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
+            quad( 5, 4, 0, 1, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         }
     }
 }
