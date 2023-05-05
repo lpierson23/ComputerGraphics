@@ -58,27 +58,27 @@ var whitePieces = [
     inPlay: true,
     color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "bishop1",
-    location: [0, 5],
-    inPlay: true,
-    color: vec4(1.0, 1.0, 1.0, 1.0)},
-    {name: "bishop2",
     location: [0, 2],
     inPlay: true,
     color: vec4(1.0, 1.0, 1.0, 1.0)},
-    {name: "knight1",
-    location: [0, 6],
+    {name: "bishop2",
+    location: [0, 5],
     inPlay: true,
     color: vec4(1.0, 1.0, 1.0, 1.0)},
-    {name: "knight2",
+    {name: "knight1",
     location: [0, 1],
     inPlay: true,
     color: vec4(1.0, 1.0, 1.0, 1.0)},
+    {name: "knight2",
+    location: [0, 6],
+    inPlay: true,
+    color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "rook1",
-    location: [0, 7],
+    location: [0, 0],
     inPlay: true,
     color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "rook2",
-    location: [0, 0],
+    location: [0, 7],
     inPlay: true,
     color: vec4(1.0, 1.0, 1.0, 1.0)},
     {name: "pawn1",
@@ -117,11 +117,11 @@ var whitePieces = [
 
 var blackPieces = [
     {name: "king",
-    location: [7, 3],
+    location: [7, 4],
     inPlay: true,
     color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "queen",
-    location: [7, 4],
+    location: [7, 3],
     inPlay: true,
     color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "bishop1",
@@ -149,35 +149,35 @@ var blackPieces = [
     inPlay: true,
     color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn1",
-    location: [6, 0],
+    location: [6, 7],
     inPlay: true,
     color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn2",
-    location: [6, 1],
-    inPlay: true,
-    color: vec4(0.0, 0.0, 0.0, 1.0)},
-    {name: "pawn3",
-    location: [6, 2],
-    inPlay: true,
-    color: vec4(0.0, 0.0, 0.0, 1.0)},
-    {name: "pawn4",
-    location: [6, 3],
-    inPlay: true,
-    color: vec4(0.0, 0.0, 0.0, 1.0)},
-    {name: "pawn5",
-    location: [6, 4],
-    inPlay: true,
-    color: vec4(0.0, 0.0, 0.0, 1.0)},
-    {name: "pawn6",
-    location: [6, 5],
-    inPlay: true,
-    color: vec4(0.0, 0.0, 0.0, 1.0)},
-    {name: "pawn7",
     location: [6, 6],
     inPlay: true,
     color: vec4(0.0, 0.0, 0.0, 1.0)},
+    {name: "pawn3",
+    location: [6, 5],
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
+    {name: "pawn4",
+    location: [6, 4],
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
+    {name: "pawn5",
+    location: [6, 3],
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
+    {name: "pawn6",
+    location: [6, 2],
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
+    {name: "pawn7",
+    location: [6, 1],
+    inPlay: true,
+    color: vec4(0.0, 0.0, 0.0, 1.0)},
     {name: "pawn8",
-    location: [6, 7],
+    location: [6, 0],
     inPlay: true,
     color: vec4(0.0, 0.0, 0.0, 1.0)},
 ];
@@ -207,6 +207,28 @@ var vertexColors = [
 function drawTurn() {
     var string = turn + "'s turn!"
     whosTurn.innerHTML = string;
+}
+
+function pieceTaken(currentLocation, color){
+    if(color == "white"){
+        if (checkIfPiece(currentLocation[0], currentLocation[1], color) == 1){
+            for (var i = 0; i++; i < blackPieces.length){
+                if (blackPieces[i]["location"] == currentLocation){
+                    blackPieces[i]["inPlay"] = false;
+                }
+            }
+        }
+    }
+
+    else if(color == "black"){
+        if (checkIfPiece(currentLocation[0], currentLocation[1], color) == 1){
+            for (var i = 0; i++; i < whitePieces.length){
+                if (whitePieces[i]["location"] == currentLocation){
+                    whitePieces[i]["inPlay"] = false;
+                }
+            }
+        }
+    }
 }
 					
 function movePiece(){
@@ -247,8 +269,8 @@ function movePiece(){
 							}
 						}
 						whitePieces[i]["location"] = [pRow, pCol];
+                        pieceTaken(whitePieces[i]["location"], "white");
 						turn = "black";
-
                         previousTurn = "white";
                         rotate = true;
 						return true;
@@ -285,6 +307,7 @@ function movePiece(){
 						}
 
 						blackPieces[i]["location"] = [pRow, pCol];
+                        pieceTaken(blackPieces[i]["location"], "black");
 						turn = "white";
                         previousTurn = "black;"
                         rotate = true;
@@ -460,6 +483,7 @@ window.onload = function init()
         theta = theta;
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 		init();
+        console.log(checkWin(turn));
 	}
 
     document.getElementById("moves").onclick = function(){
@@ -566,6 +590,75 @@ function checkIfPiece(xLoc, yLoc, color) {
 	
 }
 
+function checkWin(turn){
+    var kingLoc;
+    var possibleMoves = [];
+    var checkSpots = [];
+    var checkNow = [];
+    var kingMoves = [];
+
+    if (turn == "white"){
+        kingLoc = whitePieces[0]["location"];
+        kingMoves = playBook(whitePieces[0]);
+
+        for (var i = 0; i++; i<blackPieces.length){
+            if (blackPieces[i]["inPlay"] == true) {
+                // get moves of all black pieces in play
+                possibleMoves = playBook(blackPieces[i]);
+
+                // check plays against king position
+                for (var j = 0; j++; j < possibleMoves.length){
+                    if (possibleMoves[j] == kingLoc){
+                        checkNow.push(possibleMoves[i]);
+                    }
+                    for (var k = 0; k++; k < kingMoves.length){
+                        if (possibleMoves[j] == kingMoves[k]){
+                            checkSpots.push(possibleMoves[j]);
+                        }
+                    }
+                }
+                checkSpots.push(checkNow);
+            }
+        }
+    }
+
+    else if (turn == "black"){
+        kingLoc = blackPieces[0]["location"];
+        kingMoves = playBook(blackPieces[0]);
+
+        for (var i = 0; i++; i<whitePieces.length){
+            if (whitePieces[i]["inPlay"] == true) {
+                // get moves of all black pieces in play
+                possibleMoves = playBook(whitePieces[i]);
+
+                // check plays against king position
+                for (var j = 0; j++; j < possibleMoves.length){
+                    if (possibleMoves[j] == kingLoc){
+                        checkNowSpots.push(possibleMoves[i]);
+                    }
+                    for (var k = 0; k++; k < kingMoves.length){
+                        if (possibleMoves[j] == kingMoves[k]){
+                            checkSpots.push(possibleMoves[j]);
+                        }
+                    }
+                }
+                checkSpots.push(checkNow);
+            }
+        }
+    }
+
+    if (kingMoves == checkSpots) {
+        return "Check Mate";
+    } else {
+        if (checkNow.length > 0){
+            return "Check";
+        } else {
+            return "Resume Play";
+        }
+    }
+    
+}
+
 function playBook(piece) {
 	var possibleMoves = [];
     // this function will calculate what spaces are avilable for the piece to move to
@@ -587,34 +680,50 @@ function playBook(piece) {
     //king
     if (piece["name"] === "king" && piece["inPlay"]){
         if(checkIfPiece(xLoc - 1, yLoc - 1, pieceColor) != 2){
-			possibleMoves.push([yLoc-1, xLoc-1]);
+            if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
+			    possibleMoves.push([yLoc-1, xLoc-1]);
+            }
         }
         if(checkIfPiece(xLoc - 1, yLoc + 1, pieceColor) != 2){
-			possibleMoves.push([yLoc+1, xLoc-1]);
+            if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
+			    possibleMoves.push([yLoc+1, xLoc-1]);
+            }
         }
 
         if(checkIfPiece(xLoc + 1, yLoc + 1, pieceColor) != 2){
-			possibleMoves.push([yLoc+1, xLoc+1]);
+            if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
+			    possibleMoves.push([yLoc+1, xLoc+1]);
+            }
         }
 
         if(checkIfPiece(xLoc + 1, yLoc - 1, pieceColor) != 2){
-			possibleMoves.push([yLoc+1, xLoc-1]);
+			if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
+                possibleMoves.push([yLoc+1, xLoc-1]);
+            }
         }
 
         if(checkIfPiece(xLoc - 1, yLoc, pieceColor) != 2){
-			possibleMoves.push([yLoc, xLoc-1]);
+			if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc >= 0 && yLoc <= 8){
+                possibleMoves.push([yLoc, xLoc-1]);
+            }
         }
 
         if(checkIfPiece(xLoc + 1, yLoc, pieceColor) != 2){
-			possibleMoves.push([yLoc, xLoc+1]);
+            if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc >= 0 && yLoc <= 8){
+			    possibleMoves.push([yLoc, xLoc+1]);
+            }
         }
 
         if(checkIfPiece(xLoc, yLoc+1, pieceColor) != 2){
-			possibleMoves.push([yLoc+1, xLoc]);
+            if(xLoc >= 0 && xLoc <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
+			    possibleMoves.push([yLoc+1, xLoc]);
+            }
         }
 
         if(checkIfPiece(xLoc, yLoc-1, pieceColor) != 2){
-			possibleMoves.push([yLoc-1, xLoc]);
+			if(xLoc >= 0 && xLoc <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
+                possibleMoves.push([yLoc-1, xLoc]);
+            }
         }
     }
 
@@ -630,7 +739,7 @@ function playBook(piece) {
  			// RIGHT
  			while (j<8){
  				if(checkIfPiece(j, yLoc, pieceColor) != 2){
-					possibleMoves.push([yLoc, j]); // switch bc Row, Col = y,x 
+                    possibleMoves.push([yLoc, j]); // switch bc Row, Col = y,x 
  			 	}
  				else{ // no more paths to highlight
  					break;
@@ -667,7 +776,7 @@ function playBook(piece) {
  			// DOWN
  			while (k>=0){
  				if(checkIfPiece(xLoc, k, pieceColor) != 2){
-					possibleMoves.push([k, xLoc]);
+                    possibleMoves.push([k, xLoc]);
  			 	}
  				else{ // no more paths to highlight
  					break;
@@ -745,13 +854,17 @@ function playBook(piece) {
             // suggest if there is no piece in the spot or a piece of the other color on left
             if(checkIfPiece(xLoc - 1, yLoc + 2, pieceColor) != 2){
                 //highlight ending square
-				possibleMoves.push([yLoc+2, xLoc-1]);
+                if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc + 2 >= 0 && yLoc + 2 <= 8){
+				    possibleMoves.push([yLoc+2, xLoc-1]);
+                }
             }
 
             // suggest if there is no piece in the spot or a piece of the other color on right
             if(checkIfPiece(xLoc + 1, yLoc + 2,pieceColor) != 2){
                 //highlight ending square
-				possibleMoves.push([yLoc+2, xLoc+1]);
+                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc + 2 >= 0 && yLoc + 2 <= 8){
+				    possibleMoves.push([yLoc+2, xLoc+1]);
+                }
             }
        // }
 
@@ -759,13 +872,17 @@ function playBook(piece) {
             // suggest if there is no piece in the spot or a piece of the other color on left
             if(checkIfPiece(xLoc - 1, yLoc - 2, pieceColor) != 2){
                 //highlight ending square
-				possibleMoves.push([yLoc-2, xLoc-1]);
+                if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc - 2 >= 0 && yLoc - 2 <= 8){
+				    possibleMoves.push([yLoc-2, xLoc-1]);
+                }
             }
 
             // suggest if there is no piece in the spot or a piece of the other color on right
             if(checkIfPiece(xLoc + 1, yLoc - 2, pieceColor) != 2){
                 //highlight ending square
-				possibleMoves.push([ yLoc-2, xLoc+1]);
+                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc - 2 >= 0 && yLoc - 2 <= 8){
+				    possibleMoves.push([ yLoc-2, xLoc+1]);
+                }
             }
        // }
     }
@@ -842,17 +959,23 @@ function playBook(piece) {
 
             // if there is a piece diagonally to left and it is the opposite color
             if (checkIfPiece(xLoc - 1, yLoc + 1, white) == 1){
-				possibleMoves.push([yLoc+1, xLoc-1]);
+                if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
+				    possibleMoves.push([yLoc+1, xLoc-1]);
+                }
             }
 
             // if there is a piece diagonally to right and it is the opposite color
             if (checkIfPiece(xLoc + 1, yLoc + 1, white) == 1){
-				possibleMoves.push([yLoc+1, xLoc+1]);
+                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
+				    possibleMoves.push([yLoc+1, xLoc+1]);
+                }
             }
 
             // if there are no piece one space ahead, move there
             if (checkIfPiece(xLoc, yLoc + 1, white) == 0){
-				possibleMoves.push([yLoc+1, xLoc]);
+                if(xLoc >= 0 && xLoc <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
+				    possibleMoves.push([yLoc+1, xLoc]);
+                }
             }
         }
 
@@ -865,41 +988,28 @@ function playBook(piece) {
 
             // if there is a piece diagonally to left and it is the opposite color
             if (checkIfPiece(xLoc - 1, yLoc - 1, black) == 1){
-				possibleMoves.push([yLoc-1, xLoc-1]);
+                if (xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
+				    possibleMoves.push([yLoc-1, xLoc-1]);
+                }
             }
 
             // if there is a piece diagonally to right and it is the opposite color
             if (checkIfPiece(xLoc + 1, yLoc - 1, black) == 1){
-				possibleMoves.push([yLoc-1, xLoc+1]);
+                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
+				    possibleMoves.push([yLoc-1, xLoc+1]);
+                }
             }
 
             // if there are no piece one space ahead, move there
             if (checkIfPiece(xLoc, yLoc - 1, black) == 0){
-				possibleMoves.push([yLoc-1, xLoc]);
+                if(xLoc >= 0 && xLoc <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
+				    possibleMoves.push([yLoc-1, xLoc]);
+                }
             }
         }      
     }
 
 	return possibleMoves;
-}
-
-
-function checkWin(){
-    // loop through white pieces in play to check white win
-
-        // if any black piece can attack the king in next play, "check" (checkIfPiece returns 1 for any pieces)
-
-            // if king cannot move to avoid attack, "checkmate" (no possible moves for king using playbook(king))
-
-            // or if black piece cannot attack attacking piece, "checkmate" (loop through black pieces to see if any share the location of the attacking piece)
-
-    // loop through black pieces in play to check black win
-
-        // if any black piece can attack the king in next play, "check" (checkIfPiece returns 1 for any pieces)
-
-            // if king cannot move to avoid attack, "checkmate" (no possible moves for king using playbook(king))
-
-            // or if white piece cannot attack attacking piece, "checkmate" (loop through white pieces to see if any share the location of the attacking piece)
 }
 
 function createBoard()
