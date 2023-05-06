@@ -788,7 +788,64 @@ function playBook(piece) {
 
     //bishop
     if (piece["name"].startsWith("bishop") && piece["inPlay"]){
-
+            j = xLoc+1;
+            k = yLoc+1;
+ 			// TOP RIGHT
+ 			while (j<8 && k<8 ){
+                console.log("top right\n");
+ 				if(checkIfPiece(j, k, pieceColor) != 2){
+					possibleMoves.push([k, j]); // switch bc Row, Col = y,x 
+ 			 	}
+ 				else{ // no more paths to highlight
+ 					break;
+ 				}
+ 			 	j++;
+                k++;
+ 			}
+			j = xLoc - 1;
+            k = yLoc + 1;
+ 			// TOP LEFT
+ 			while (j>=0 && k < 8){
+                console.log("top left\n");
+ 				if(checkIfPiece(j, k, pieceColor) != 2){
+					possibleMoves.push([k, j]);
+ 			 	}
+ 				else{ // no more paths to highlight
+ 					break;
+ 				}
+                 j--;
+                 k++;
+ 			}
+			
+ 			// BOTTOM LEFT
+            j = xLoc - 1;
+            k = yLoc - 1;
+ 			while (j>=0 && k>0){
+                console.log("bottom left\n");
+ 				if(checkIfPiece(j, k, pieceColor) != 2){
+					possibleMoves.push([k, j]);
+ 			 	}
+ 				else{ // no more paths to highlight
+ 					break;
+ 				}
+                 j--;
+                 k--;
+ 			}
+             j = xLoc + 1;
+             k = yLoc - 1;
+ 			// BOTTOM RIGHT
+ 			while (j<8 && k>=0){
+                console.log("bottom right\n");
+ 				if(checkIfPiece(j, k, pieceColor) != 2){
+					possibleMoves.push([k, j]);
+ 			 	}
+ 				else{ // no more paths to highlight
+ 					break;
+ 				}
+                 j++;
+                 k--;
+ 			}
+ 			//}    
     }
 
     //knight
@@ -839,6 +896,7 @@ function playBook(piece) {
 			
 			// RIGHT
 			while (j<8){
+                console.log("right\n");
 				if(checkIfPiece(j, yLoc, pieceColor) != 2){
 					possibleMoves.push([yLoc, j]);
 			 	}
@@ -851,6 +909,7 @@ function playBook(piece) {
 			j = xLoc-1;
 			// LEFT
 			while (j>=0){
+                console.log("left\n");
 				if(checkIfPiece(j, yLoc, pieceColor) != 2){
 					possibleMoves.push([yLoc, j]);
 			 	}
@@ -864,6 +923,7 @@ function playBook(piece) {
 			k = yLoc+1;
 			// UP
 			while (k<8){
+                console.log("up\n");
 				if(checkIfPiece(xLoc, k, pieceColor) != 2){
 					possibleMoves.push([k, xLoc]);
             	}
@@ -876,6 +936,7 @@ function playBook(piece) {
 			k = yLoc-1;
 			// DOWN
 			while (k>=0){
+                console.log("down\n");
 				if(checkIfPiece(xLoc, k, pieceColor) != 2){
 					possibleMoves.push([k, xLoc]);
 			 	}
