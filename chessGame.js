@@ -30,7 +30,7 @@ var texCoord = [
 ];
 
 var ctMatrix;
-var u_ctMatrixLoc;
+var u_ctMatricol;
 
 var a_vColorLoc;
 var a_vPositionLoc;
@@ -47,7 +47,7 @@ var m_mousey = 1;
 var trackballMove = false;
 var position = trackball(0.0, 0.0, 0.0, 0.0);
 
-// piece data (location is [y, x])
+// piece data (location is [row, column])
 var whitePieces = [
     {name: "king",
     location: [0, 3],
@@ -211,7 +211,7 @@ function drawTurn() {
 
 function pieceTaken(currentLocation, color){
     if(color == "white"){
-        if (checkIfPiece(currentLocation[0], currentLocation[1], color) == 1){
+        if (checkIfPiece(currentLocation[1], currentLocation[0], color) == 1){
             for (var i = 0; i++; i < blackPieces.length){
                 if (blackPieces[i]["location"] == currentLocation){
                     blackPieces[i]["inPlay"] = false;
@@ -221,7 +221,7 @@ function pieceTaken(currentLocation, color){
     }
 
     else if(color == "black"){
-        if (checkIfPiece(currentLocation[0], currentLocation[1], color) == 1){
+        if (checkIfPiece(currentLocation[1], currentLocation[0], color) == 1){
             for (var i = 0; i++; i < whitePieces.length){
                 if (whitePieces[i]["location"] == currentLocation){
                     whitePieces[i]["inPlay"] = false;
@@ -243,7 +243,7 @@ function movePiece(){
 
 		if (turn == "white"){
 			console.log("moving WHITE ");
-			console.log("pRow "+pRow+"pCol "+pCol);
+			console.log("pRow "+pRow+" pCol "+pCol);
 
 			for (var k=0; k<16; k++){
 				
@@ -400,7 +400,7 @@ window.onload = function init()
     gl.vertexAttribPointer( a_vPositionLoc, 4, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( a_vPositionLoc );
 
-    u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
+    u_ctMatricol = gl.getUniformLocation(program, "u_ctMatrix");
 	
 	
     // send texture coordiantes data down to the GPU
@@ -504,8 +504,9 @@ function showGuide(pieceName){
         for (var k=0; k<16; k++){
             if (whitePieces[k]["name"] == pieceName){
                 possibleMoves = playBook(whitePieces[k]);
+                console.log(possibleMoves.length);
                 for (var p=0; p<possibleMoves.length; p++){
-                    spaceVertices = highlightMoves(possibleMoves[p][1], possibleMoves[p][0]);
+                    spaceVertices = highlightMoves(possibleMoves[p][0], possibleMoves[p][1]);
                     quad( 1, 0, 3, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     quad( 2, 3, 7, 6, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     quad( 3, 0, 4, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -520,8 +521,10 @@ function showGuide(pieceName){
         for (var k=0; k<16; k++){
             if (blackPieces[k]["name"] == pieceName){
                 possibleMoves = playBook(blackPieces[k]);
+                console.log(possibleMoves.length);
+                var count = 0;
                 for (var p=0; p<possibleMoves.length; p++){
-                    spaceVertices = highlightMoves(possibleMoves[p][1], possibleMoves[p][0]);
+                    spaceVertices = highlightMoves(possibleMoves[p][0], possibleMoves[p][1]);
                     quad( 1, 0, 3, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     quad( 2, 3, 7, 6, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     quad( 3, 0, 4, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
@@ -529,30 +532,32 @@ function showGuide(pieceName){
                     quad( 4, 5, 6, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     quad( 5, 4, 0, 1, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     NumVertices += 6;
+                    count ++;
                 }
+                console.log(count);
             }
         }
     }
 }
 
-function highlightMoves(xLoc, yLoc){
+function highlightMoves(row, col){
     // calculate vertices for a square where piece can move
     // should appear as a yellow square slightly raised from the board
     var vertices = [
-        vec4( -0.8 + ((0.2) * xLoc) + 0.2 , -0.8 + ((0.2) * yLoc),  0.06, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.2,  -0.8 + ((0.2) * yLoc) + 0.20,  0.06, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc),  -0.8 + ((0.2) * yLoc) + 0.20,  0.06, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc), -0.8 + ((0.2) * yLoc),  0.06, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.2, -0.8 + ((0.2) * yLoc), 0.04, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.2,  -0.8 + ((0.2) * yLoc) + 0.20, 0.04, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc),  -0.8 + ((0.2) * yLoc) + 0.20, 0.04, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc), -0.8 + ((0.2) * yLoc), 0.04, 1.0 )
+        vec4( -0.8 + ((0.2) * col) + 0.2 , -0.8 + ((0.2) * row),  0.06, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.2,  -0.8 + ((0.2) * row) + 0.20,  0.06, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col),  -0.8 + ((0.2) * row) + 0.20,  0.06, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col), -0.8 + ((0.2) * row),  0.06, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.2, -0.8 + ((0.2) * row), 0.04, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.2,  -0.8 + ((0.2) * row) + 0.20, 0.04, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col),  -0.8 + ((0.2) * row) + 0.20, 0.04, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col), -0.8 + ((0.2) * row), 0.04, 1.0 )
     ];
 
     return vertices;
 }
 
-function checkIfPiece(xLoc, yLoc, color) {
+function checkIfPiece(col, row, color) {
     // this function will check if there is a piece in the given space and that it is the opposite color
 	var white = vec4(1.0, 1.0, 1.0, 1.0);
 	var colorWhite = true;
@@ -564,22 +569,22 @@ function checkIfPiece(xLoc, yLoc, color) {
 
     for (var i = 0; i < 16; i++){
 		if (colorWhite == true){ // you are white
-       		if (blackPieces[i]["location"][1] == xLoc && blackPieces[i]["location"][0] == yLoc && blackPieces[i]["inPlay"]){
+       		if (blackPieces[i]["location"][0] == row && blackPieces[i]["location"][1] == col && blackPieces[i]["inPlay"]){
            		 // there is a piece in that location that can be attacked (black piece in that spot and you are white)
             	return 1;
         	}
-        	else if (whitePieces[i]["location"][1] == xLoc && whitePieces[i]["location"][0] == yLoc && whitePieces[i]["inPlay"]){
+        	else if (whitePieces[i]["location"][0] == row && whitePieces[i]["location"][1] == col && whitePieces[i]["inPlay"]){
            	 	// there is a piece in that location, but it is the same color as your team (white piece in that spot and you are white)
             	return 2;
         	}
 
 		}
 		else{ // you are black
-       	 	if (whitePieces[i]["location"][1] == xLoc && whitePieces[i]["location"][0] == yLoc && whitePieces[i]["inPlay"]){
+       	 	if (whitePieces[i]["location"][0] == row && whitePieces[i]["location"][1] == col && whitePieces[i]["inPlay"]){
             	// there is a piece in that location that can be attacked (white piece in that spot and you are black)
            	 	return 1;
        	 	} 
-       	 	else if (blackPieces[i]["location"][1] == xLoc && blackPieces[i]["location"][0] == yLoc && blackPieces[i]["inPlay"]){
+       	 	else if (blackPieces[i]["location"][0] == row && blackPieces[i]["location"][1] == col && blackPieces[i]["inPlay"]){
            	 	// there is a piece in that location, but it is the same color as your team (black piece in that spot and you are black)
            	 	return 2;
       	  	}
@@ -662,8 +667,8 @@ function checkWin(turn){
 function playBook(piece) {
 	var possibleMoves = [];
     // this function will calculate what spaces are avilable for the piece to move to
-    var xLoc = piece["location"][1];
-    var yLoc = piece["location"][0];
+    var row = piece["location"][0];
+    var col = piece["location"][1];
     var pieceColor = piece["color"];
     var white = vec4(1.0, 1.0, 1.0, 1.0);
     var black = vec4(0.0, 0.0, 0.0, 1.0);
@@ -679,50 +684,50 @@ function playBook(piece) {
     
     //king
     if (piece["name"] === "king" && piece["inPlay"]){
-        if(checkIfPiece(xLoc - 1, yLoc - 1, pieceColor) != 2){
-            if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
-			    possibleMoves.push([yLoc-1, xLoc-1]);
+        if(checkIfPiece(col - 1, row - 1, pieceColor) != 2){
+            if(col - 1 >= 0 && col - 1 < 8 && row - 1 >= 0 && row - 1 < 8){
+			    possibleMoves.push([row-1, col-1]);
             }
         }
-        if(checkIfPiece(xLoc - 1, yLoc + 1, pieceColor) != 2){
-            if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
-			    possibleMoves.push([yLoc+1, xLoc-1]);
-            }
-        }
-
-        if(checkIfPiece(xLoc + 1, yLoc + 1, pieceColor) != 2){
-            if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
-			    possibleMoves.push([yLoc+1, xLoc+1]);
+        if(checkIfPiece(col - 1, row + 1, pieceColor) != 2){
+            if(col - 1 >= 0 && col - 1 < 8 && row + 1 >= 0 && row + 1 < 8){
+			    possibleMoves.push([row+1, col-1]);
             }
         }
 
-        if(checkIfPiece(xLoc + 1, yLoc - 1, pieceColor) != 2){
-			if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
-                possibleMoves.push([yLoc+1, xLoc-1]);
+        if(checkIfPiece(col + 1, row + 1, pieceColor) != 2){
+            if(col + 1 >= 0 && col + 1 < 8 && row + 1 >= 0 && row + 1 < 8){
+			    possibleMoves.push([row+1, col+1]);
             }
         }
 
-        if(checkIfPiece(xLoc - 1, yLoc, pieceColor) != 2){
-			if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc >= 0 && yLoc <= 8){
-                possibleMoves.push([yLoc, xLoc-1]);
+        if(checkIfPiece(col + 1, row - 1, pieceColor) != 2){
+			if(col + 1 >= 0 && col + 1 < 8 && row - 1 >= 0 && row - 1 < 8){
+                possibleMoves.push([row+1, col-1]);
             }
         }
 
-        if(checkIfPiece(xLoc + 1, yLoc, pieceColor) != 2){
-            if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc >= 0 && yLoc <= 8){
-			    possibleMoves.push([yLoc, xLoc+1]);
+        if(checkIfPiece(col - 1, row, pieceColor) != 2){
+			if(col - 1 >= 0 && col - 1 < 8 && row >= 0 && row < 8){
+                possibleMoves.push([row, col-1]);
             }
         }
 
-        if(checkIfPiece(xLoc, yLoc+1, pieceColor) != 2){
-            if(xLoc >= 0 && xLoc <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
-			    possibleMoves.push([yLoc+1, xLoc]);
+        if(checkIfPiece(col + 1, row, pieceColor) != 2){
+            if(col + 1 >= 0 && col + 1 < 8 && row >= 0 && row < 8){
+			    possibleMoves.push([row, col+1]);
             }
         }
 
-        if(checkIfPiece(xLoc, yLoc-1, pieceColor) != 2){
-			if(xLoc >= 0 && xLoc <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
-                possibleMoves.push([yLoc-1, xLoc]);
+        if(checkIfPiece(col, row+1, pieceColor) != 2){
+            if(col >= 0 && col < 8 && row + 1 >= 0 && row + 1 < 8){
+			    possibleMoves.push([row+1, col]);
+            }
+        }
+
+        if(checkIfPiece(col, row-1, pieceColor) != 2){
+			if(col >= 0 && col < 8 && row - 1 >= 0 && row - 1 < 8){
+                possibleMoves.push([row-1, col]);
             }
         }
     }
@@ -733,13 +738,13 @@ function playBook(piece) {
 		
         // if (pieceColor == white){
              // suggest if there is no piece in the spot or a piece of the other color on right
- 			j = xLoc+1;
- 			k = yLoc;
+ 			j = col+1;
+ 			k = row;
 			
  			// RIGHT
  			while (j<8){
- 				if(checkIfPiece(j, yLoc, pieceColor) != 2){
-                    possibleMoves.push([yLoc, j]); // switch bc Row, Col = y,x 
+ 				if(checkIfPiece(j, row, pieceColor) != 2){
+                    possibleMoves.push([row, j]); // switch bc Row, Col = y,x 
  			 	}
  				else{ // no more paths to highlight
  					break;
@@ -747,11 +752,11 @@ function playBook(piece) {
  			 	j++;
  			}
 			
- 			j = xLoc-1;
+ 			j = col-1;
  			// LEFT
  			while (j>=0){
- 				if(checkIfPiece(j, yLoc, pieceColor) != 2){
-					possibleMoves.push([yLoc, j]);
+ 				if(checkIfPiece(j, row, pieceColor) != 2){
+					possibleMoves.push([row, j]);
  			 	}
  				else{ // no more paths to highlight
  					break;
@@ -759,12 +764,12 @@ function playBook(piece) {
  			 	j--;
  			}
 			
- 			j = xLoc;
- 			k = yLoc+1;
+ 			j = col;
+ 			k = row+1;
  			// UP
  			while (k<8){
- 				if(checkIfPiece(xLoc, k, pieceColor) != 2){
-					possibleMoves.push([k, xLoc]);
+ 				if(checkIfPiece(col, k, pieceColor) != 2){
+					possibleMoves.push([k, col]);
  			 	}
  				else{ // no more paths to highlight
  					break;
@@ -772,11 +777,11 @@ function playBook(piece) {
  			 	k++;
  			}
 			
- 			k = yLoc-1;
+ 			k = row-1;
  			// DOWN
  			while (k>=0){
- 				if(checkIfPiece(xLoc, k, pieceColor) != 2){
-                    possibleMoves.push([k, xLoc]);
+ 				if(checkIfPiece(col, k, pieceColor) != 2){
+                    possibleMoves.push([k, col]);
  			 	}
  				else{ // no more paths to highlight
  					break;
@@ -788,8 +793,8 @@ function playBook(piece) {
 
     //bishop
     if (piece["name"].startsWith("bishop") && piece["inPlay"]){
-            j = xLoc+1;
-            k = yLoc+1;
+            j = col+1;
+            k = row+1;
  			// TOP RIGHT
  			while (j<8 && k<8 ){
                 console.log("top right\n");
@@ -802,8 +807,8 @@ function playBook(piece) {
  			 	j++;
                 k++;
  			}
-			j = xLoc - 1;
-            k = yLoc + 1;
+			j = col - 1;
+            k = row + 1;
  			// TOP LEFT
  			while (j>=0 && k < 8){
                 console.log("top left\n");
@@ -818,8 +823,8 @@ function playBook(piece) {
  			}
 			
  			// BOTTOM LEFT
-            j = xLoc - 1;
-            k = yLoc - 1;
+            j = col - 1;
+            k = row - 1;
  			while (j>=0 && k>0){
                 console.log("bottom left\n");
  				if(checkIfPiece(j, k, pieceColor) != 2){
@@ -831,8 +836,8 @@ function playBook(piece) {
                  j--;
                  k--;
  			}
-             j = xLoc + 1;
-             k = yLoc - 1;
+             j = col + 1;
+             k = row - 1;
  			// BOTTOM RIGHT
  			while (j<8 && k>=0){
                 console.log("bottom right\n");
@@ -850,55 +855,84 @@ function playBook(piece) {
 
     //knight
     if (piece["name"].startsWith("knight") && piece["inPlay"]){
-       // if (pieceColor == white){
-            // suggest if there is no piece in the spot or a piece of the other color on left
-            if(checkIfPiece(xLoc - 1, yLoc + 2, pieceColor) != 2){
-                //highlight ending square
-                if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc + 2 >= 0 && yLoc + 2 <= 8){
-				    possibleMoves.push([yLoc+2, xLoc-1]);
-                }
+       
+        // suggest if there is no piece in the spot or a piece of the other color on left
+        if(checkIfPiece(col - 1, row + 2, pieceColor) != 2){
+            //highlight ending square
+            if(col - 1 >= 0 && col - 1 < 8 && row + 2 >= 0 && row + 2 < 8){
+                possibleMoves.push([row+2, col-1]);
             }
+        }
 
-            // suggest if there is no piece in the spot or a piece of the other color on right
-            if(checkIfPiece(xLoc + 1, yLoc + 2,pieceColor) != 2){
-                //highlight ending square
-                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc + 2 >= 0 && yLoc + 2 <= 8){
-				    possibleMoves.push([yLoc+2, xLoc+1]);
-                }
+        // suggest if there is no piece in the spot or a piece of the other color on right
+        if(checkIfPiece(col + 1, row + 2,pieceColor) != 2){
+            //highlight ending square
+            if(col + 1 >= 0 && col + 1 < 8 && row + 2 >= 0 && row + 2 < 8){
+                possibleMoves.push([row+2, col+1]);
             }
-       // }
+        }
 
-      //  if (pieceColor == black){
-            // suggest if there is no piece in the spot or a piece of the other color on left
-            if(checkIfPiece(xLoc - 1, yLoc - 2, pieceColor) != 2){
-                //highlight ending square
-                if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc - 2 >= 0 && yLoc - 2 <= 8){
-				    possibleMoves.push([yLoc-2, xLoc-1]);
-                }
+        // suggest if there is no piece in the spot or a piece of the other color on left
+        if(checkIfPiece(col - 1, row - 2, pieceColor) != 2){
+            //highlight ending square
+            if(col - 1 >= 0 && col - 1 < 8 && row - 2 >= 0 && row - 2 < 8){
+                possibleMoves.push([row-2, col-1]);
             }
+        }
 
-            // suggest if there is no piece in the spot or a piece of the other color on right
-            if(checkIfPiece(xLoc + 1, yLoc - 2, pieceColor) != 2){
-                //highlight ending square
-                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc - 2 >= 0 && yLoc - 2 <= 8){
-				    possibleMoves.push([ yLoc-2, xLoc+1]);
-                }
+        // suggest if there is no piece in the spot or a piece of the other color on right
+        if(checkIfPiece(col + 1, row - 2, pieceColor) != 2){
+            //highlight ending square
+            if(col + 1 >= 0 && col + 1 < 8 && row - 2 >= 0 && row - 2 < 8){
+                possibleMoves.push([ row-2, col+1]);
             }
-       // }
+        }
+
+       // suggest if there is no piece in the spot or a piece of the other color on left
+        if(checkIfPiece(col + 2, row - 1, pieceColor) != 2){
+        //highlight ending square
+            if(col + 2 >= 0 && col + 2 < 8 && row - 1 >= 0 && row - 1 < 8){
+                possibleMoves.push([row-1, col+2]);
+            }
+        }
+
+        // suggest if there is no piece in the spot or a piece of the other color on right
+        if(checkIfPiece(col + 2, row + 1,pieceColor) != 2){
+            //highlight ending square
+            if(col + 2 >= 0 && col + 2 < 8 && row + 1 >= 0 && row + 1 < 8){
+                possibleMoves.push([row+1, col+2]);
+            }
+        }
+
+        // suggest if there is no piece in the spot or a piece of the other color on left
+        if(checkIfPiece(col - 2, row - 1, pieceColor) != 2){
+            //highlight ending square
+            if(col - 2 >= 0 && col - 2 < 8 && row - 1 >= 0 && row - 1 < 8){
+                possibleMoves.push([row-1, col-2]);
+            }
+        }
+
+        // suggest if there is no piece in the spot or a piece of the other color on right
+        if(checkIfPiece(col - 2, row + 1, pieceColor) != 2){
+            //highlight ending square
+            if(col - 2 >= 0 && col - 2 < 8 && row + 1 >= 0 && row + 1 < 8){
+                possibleMoves.push([ row+1, col-2]);
+            }
+        }
     }
 
     //rook
     if (piece["name"].startsWith("rook") && piece["inPlay"]){
        // if (pieceColor == white){
             // suggest if there is no piece in the spot or a piece of the other color on right
-			j = xLoc+1;
-			k = yLoc;
+			j = col+1;
+			k = row;
 			
 			// RIGHT
 			while (j<8){
                 console.log("right\n");
-				if(checkIfPiece(j, yLoc, pieceColor) != 2){
-					possibleMoves.push([yLoc, j]);
+				if(checkIfPiece(j, row, pieceColor) != 2){
+					possibleMoves.push([row, j]);
 			 	}
 				else{ // no more paths to highlight
 					break;
@@ -906,12 +940,12 @@ function playBook(piece) {
 			 	j++;
 			}
 			
-			j = xLoc-1;
+			j = col-1;
 			// LEFT
 			while (j>=0){
                 console.log("left\n");
-				if(checkIfPiece(j, yLoc, pieceColor) != 2){
-					possibleMoves.push([yLoc, j]);
+				if(checkIfPiece(j, row, pieceColor) != 2){
+					possibleMoves.push([row, j]);
 			 	}
 				else{ // no more paths to highlight
 					break;
@@ -919,13 +953,13 @@ function playBook(piece) {
 			 	j--;
 			}
 			
-			j = xLoc;
-			k = yLoc+1;
+			j = col;
+			k = row+1;
 			// UP
 			while (k<8){
                 console.log("up\n");
-				if(checkIfPiece(xLoc, k, pieceColor) != 2){
-					possibleMoves.push([k, xLoc]);
+				if(checkIfPiece(col, k, pieceColor) != 2){
+					possibleMoves.push([k, col]);
             	}
 				else{ // no more paths to highlight
 					break;
@@ -933,12 +967,12 @@ function playBook(piece) {
 			 	k++;
 			}
 			
-			k = yLoc-1;
+			k = row-1;
 			// DOWN
 			while (k>=0){
                 console.log("down\n");
-				if(checkIfPiece(xLoc, k, pieceColor) != 2){
-					possibleMoves.push([k, xLoc]);
+				if(checkIfPiece(col, k, pieceColor) != 2){
+					possibleMoves.push([k, col]);
 			 	}
 				else{ // no more paths to highlight
 					break;
@@ -952,63 +986,63 @@ function playBook(piece) {
     if (piece["name"].startsWith("pawn") && piece["inPlay"]){
         if(colorWhite){
             //check if pawn has been moved already and if there is no piece two spaces ahead
-            if (yLoc == 1 && checkIfPiece(xLoc, yLoc + 2, white) == 0){
+            if (row == 1 && checkIfPiece(col, row + 2, white) == 0){
                 // highlight move two forward for white piece
-				possibleMoves.push([yLoc+2, xLoc]);
+				possibleMoves.push([row+2, col]);
             }
 
             // if there is a piece diagonally to left and it is the opposite color
-            if (checkIfPiece(xLoc - 1, yLoc + 1, white) == 1){
-                if(xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
-				    possibleMoves.push([yLoc+1, xLoc-1]);
+            if (checkIfPiece(col - 1, row + 1, white) == 1){
+                if(col - 1 >= 0 && col - 1 < 8 && row + 1 >= 0 && row + 1 < 8){
+				    possibleMoves.push([row+1, col-1]);
                 }
             }
 
             // if there is a piece diagonally to right and it is the opposite color
-            if (checkIfPiece(xLoc + 1, yLoc + 1, white) == 1){
-                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
-				    possibleMoves.push([yLoc+1, xLoc+1]);
+            if (checkIfPiece(col + 1, row + 1, white) == 1){
+                if(col + 1 >= 0 && col + 1 < 8 && row + 1 >= 0 && row + 1 < 8){
+				    possibleMoves.push([row+1, col+1]);
                 }
             }
 
             // if there are no piece one space ahead, move there
-            if (checkIfPiece(xLoc, yLoc + 1, white) == 0){
-                if(xLoc >= 0 && xLoc <= 8 && yLoc + 1 >= 0 && yLoc + 1 <= 8){
-				    possibleMoves.push([yLoc+1, xLoc]);
+            if (checkIfPiece(col, row + 1, white) == 0){
+                if(col >= 0 && col < 8 && row + 1 >= 0 && row + 1 < 8){
+				    possibleMoves.push([row+1, col]);
                 }
             }
         }
 
         else{
             //check if pawn has been moved already and if there is no piece two spaces ahead
-            if (yLoc == 6 && checkIfPiece(xLoc, yLoc - 2, black) == 0){
+            if (row == 6 && checkIfPiece(col, row - 2, black) == 0){
                 // highlight move two forward for black piece
-				possibleMoves.push([yLoc-2, xLoc]);
+				possibleMoves.push([row-2, col]);
             }
 
             // if there is a piece diagonally to left and it is the opposite color
-            if (checkIfPiece(xLoc - 1, yLoc - 1, black) == 1){
-                if (xLoc - 1 >= 0 && xLoc - 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
-				    possibleMoves.push([yLoc-1, xLoc-1]);
+            if (checkIfPiece(col - 1, row - 1, black) == 1){
+                if (col - 1 >= 0 && col - 1 < 8 && row - 1 >= 0 && row - 1 < 8){
+				    possibleMoves.push([row-1, col-1]);
                 }
             }
 
             // if there is a piece diagonally to right and it is the opposite color
-            if (checkIfPiece(xLoc + 1, yLoc - 1, black) == 1){
-                if(xLoc + 1 >= 0 && xLoc + 1 <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
-				    possibleMoves.push([yLoc-1, xLoc+1]);
+            if (checkIfPiece(col + 1, row - 1, black) == 1){
+                if(col + 1 >= 0 && col + 1 < 8 && row - 1 >= 0 && row - 1 < 8){
+				    possibleMoves.push([row-1, col+1]);
                 }
             }
 
             // if there are no piece one space ahead, move there
-            if (checkIfPiece(xLoc, yLoc - 1, black) == 0){
-                if(xLoc >= 0 && xLoc <= 8 && yLoc - 1 >= 0 && yLoc - 1 <= 8){
-				    possibleMoves.push([yLoc-1, xLoc]);
+            if (checkIfPiece(col, row - 1, black) == 0){
+                if(col >= 0 && col < 8 && row - 1 >= 0 && row - 1 < 8){
+				    possibleMoves.push([row-1, col]);
                 }
             }
         }      
     }
-
+    console.log(possibleMoves);
 	return possibleMoves;
 }
 
@@ -1054,28 +1088,28 @@ function quad(a, b, c, d, vertices, color)
     }
 }
 
-function calculateKingVertices(xLoc, yLoc) {
+function calculateKingVertices(col, row) {
     var vertices = [
         //base square
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
 
 
         //triangle
-        vec4( -0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.15,  0.35, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.15,  0.35, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.10,  0.35, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.05,  0.35, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.25, 1.0 )
+        vec4( -0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.10,  0.35, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.25, 1.0 )
 
     ];
 
@@ -1084,13 +1118,13 @@ function calculateKingVertices(xLoc, yLoc) {
 }
 
 function drawKing() {
-    var kingXLoc = 0;
-    var kingYLoc = 0;
+    var kingcol = 0;
+    var kingrow = 0;
     var kingVertices;
     if (whitePieces[0]["inPlay"]){
-        kingXLoc = whitePieces[0]["location"][1];
-        kingYLoc = whitePieces[0]["location"][0];
-        kingVertices = calculateKingVertices(kingXLoc, kingYLoc);
+        kingcol = whitePieces[0]["location"][1];
+        kingrow = whitePieces[0]["location"][0];
+        kingVertices = calculateKingVertices(kingcol, kingrow);
 
         quad( 1, 0, 3, 2, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
         quad( 2, 3, 7, 6, kingVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1110,9 +1144,9 @@ function drawKing() {
     }
 
     if (blackPieces[0]["inPlay"]){
-        kingXLoc = blackPieces[0]["location"][1];
-        kingYLoc = blackPieces[0]["location"][0];
-        kingVertices = calculateKingVertices(kingXLoc, kingYLoc);
+        kingcol = blackPieces[0]["location"][1];
+        kingrow = blackPieces[0]["location"][0];
+        kingVertices = calculateKingVertices(kingcol, kingrow);
 
         quad( 1, 0, 3, 2, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 2, 3, 7, 6, kingVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1133,20 +1167,20 @@ function drawKing() {
     }
 }
 
-function calculateQueenVertices(xLoc, yLoc){
+function calculateQueenVertices(col, row){
     var queenVertices = [
 
-        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05 ,  0.35, 1 ), // TBR
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.35, 1 ), //TFR
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1 ), //TFL
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1 ), // TBL
+        vec4( -0.8 + 0.15 + (0.2*col), -0.8 + ((0.2) * row) + 0.05 ,  0.35, 1 ), // TBR
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1 ), //TFR
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1 ), //TFL
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1 ), // TBL
 		
 
     
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1 ), // BR
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1 ), //FR
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1 ), //FL
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1 ), //BL
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ), // BR
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ), //FR
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ), //FL
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ), //BL
 		
 
     ];
@@ -1155,14 +1189,14 @@ function calculateQueenVertices(xLoc, yLoc){
 }
 
 function drawQueen() {
-    var queenXLoc = 0;
-    var queenYLoc = 0;
+    var queencol = 0;
+    var queenrow = 0;
     var queenVertices;
 	
     if (whitePieces[1]["inPlay"]){
-        queenXLoc = whitePieces[1]["location"][1];
-		queenYLoc = whitePieces[1]["location"][0];
-        queenVertices = calculateQueenVertices(queenXLoc, queenYLoc);
+        queencol = whitePieces[1]["location"][1];
+		queenrow = whitePieces[1]["location"][0];
+        queenVertices = calculateQueenVertices(queencol, queenrow);
 
         
         quad( 1, 0, 3, 2, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1175,9 +1209,9 @@ function drawQueen() {
     }
 
     if (blackPieces[1]["inPlay"]){
-        queenXLoc = blackPieces[1]["location"][1];
-		queenYLoc = blackPieces[1]["location"][0];
-        queenVertices = calculateQueenVertices(queenXLoc, queenYLoc);
+        queencol = blackPieces[1]["location"][1];
+		queenrow = blackPieces[1]["location"][0];
+        queenVertices = calculateQueenVertices(queencol, queenrow);
 
         quad( 1, 0, 3, 2, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 2, 3, 7, 6, queenVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1189,27 +1223,27 @@ function drawQueen() {
 }
 
 //------Emelie------
-function calculateBishopVertices(xLoc, yLoc) {
+function calculateBishopVertices(col, row) {
     var vertices = [
     //base square
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
 
     //triangle
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.10,  0.25, 1.0 ),
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.10,  0.25, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 ),
-    vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 )
+    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.10,  0.25, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.10,  0.25, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 )
     ];
 
     return vertices;
@@ -1217,14 +1251,14 @@ function calculateBishopVertices(xLoc, yLoc) {
 }
 
 function drawBishop() {
-    var bishopXLoc = 0;
-    var bishopYLoc = 0;
+    var bishopcol = 0;
+    var bishoprow = 0;
     var bishopVertices;
 
     if (whitePieces[2]["inPlay"]){
-        bishopXLoc = whitePieces[2]["location"][1];
-        bishopYLoc = whitePieces[2]["location"][0];
-        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+        bishopcol = whitePieces[2]["location"][1];
+        bishoprow = whitePieces[2]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopcol, bishoprow);
 
         quad( 1, 0, 3, 2, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
         quad( 2, 3, 7, 6, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1243,9 +1277,9 @@ function drawBishop() {
     } 
 
     if (whitePieces[3]["inPlay"]){
-        bishopXLoc = whitePieces[3]["location"][1];
-        bishopYLoc = whitePieces[3]["location"][0];
-        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+        bishopcol = whitePieces[3]["location"][1];
+        bishoprow = whitePieces[3]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopcol, bishoprow);
 
         quad( 1, 0, 3, 2, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
         quad( 2, 3, 7, 6, bishopVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1264,9 +1298,9 @@ function drawBishop() {
     }
 
     if (blackPieces[2]["inPlay"]){
-        bishopXLoc = blackPieces[2]["location"][1];
-        bishopYLoc = blackPieces[2]["location"][0];
-        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+        bishopcol = blackPieces[2]["location"][1];
+        bishoprow = blackPieces[2]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopcol, bishoprow);
 
         quad( 1, 0, 3, 2, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 2, 3, 7, 6, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1285,9 +1319,9 @@ function drawBishop() {
     }
 
     if (blackPieces[3]["inPlay"]){
-        bishopXLoc = blackPieces[3]["location"][1];
-        bishopYLoc = blackPieces[3]["location"][0];
-        bishopVertices = calculateBishopVertices(bishopXLoc, bishopYLoc);
+        bishopcol = blackPieces[3]["location"][1];
+        bishoprow = blackPieces[3]["location"][0];
+        bishopVertices = calculateBishopVertices(bishopcol, bishoprow);
 
         quad( 1, 0, 3, 2, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 2, 3, 7, 6, bishopVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1306,27 +1340,27 @@ function drawBishop() {
     }
 }
 
-function calculateKnightVertices(xLoc, yLoc) {
+function calculateKnightVertices(col, row) {
     var vertices = [
         //base square
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
 
         // small rectangle on top
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.10,  -0.8 + ((0.2) * yLoc) + 0.15, 0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.10, -0.8 + ((0.2) * yLoc) + 0.05, 0.15, 1.0 )
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 )
     ];
 
     return vertices;
@@ -1334,14 +1368,14 @@ function calculateKnightVertices(xLoc, yLoc) {
 
 function drawKnight() {
     if (whitePieces[4]["inPlay"]){
-        var knightXLoc = 0;
-        var knightYLoc = 0;
+        var knightcol = 0;
+        var knightrow = 0;
         var knightVertices;
     
         if (whitePieces[4]["inPlay"]){
-            knightXLoc = whitePieces[4]["location"][1];
-            knightYLoc = whitePieces[4]["location"][0];
-            knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            knightcol = whitePieces[4]["location"][1];
+            knightrow = whitePieces[4]["location"][0];
+            knightVertices = calculateKnightVertices(knightcol, knightrow);
     
             quad( 1, 0, 3, 2, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
             quad( 2, 3, 7, 6, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1360,9 +1394,9 @@ function drawKnight() {
     
         if (whitePieces[5]["inPlay"]){
     
-            knightXLoc = whitePieces[5]["location"][1];
-            knightYLoc = whitePieces[5]["location"][0];
-            knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            knightcol = whitePieces[5]["location"][1];
+            knightrow = whitePieces[5]["location"][0];
+            knightVertices = calculateKnightVertices(knightcol, knightrow);
     
             quad( 1, 0, 3, 2, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
             quad( 2, 3, 7, 6, knightVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1381,9 +1415,9 @@ function drawKnight() {
     
         if (blackPieces[4]["inPlay"]){
     
-            knightXLoc = blackPieces[4]["location"][1];
-            knightYLoc = blackPieces[4]["location"][0];
-            knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            knightcol = blackPieces[4]["location"][1];
+            knightrow = blackPieces[4]["location"][0];
+            knightVertices = calculateKnightVertices(knightcol, knightrow);
     
             quad( 1, 0, 3, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1402,9 +1436,9 @@ function drawKnight() {
     
         if (blackPieces[5]["inPlay"]){
     
-            knightXLoc = blackPieces[5]["location"][1];
-            knightYLoc = blackPieces[5]["location"][0];
-            knightVertices = calculateKnightVertices(knightXLoc, knightYLoc);
+            knightcol = blackPieces[5]["location"][1];
+            knightrow = blackPieces[5]["location"][0];
+            knightVertices = calculateKnightVertices(knightcol, knightrow);
     
             quad( 1, 0, 3, 2, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, knightVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1423,16 +1457,16 @@ function drawKnight() {
     }
 
 }
-function calculateRookVertices(xLoc, yLoc){
+function calculateRookVertices(col, row){
     var rookVertices = [
-        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05 ,  0.25, 1 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.25, 1 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.25, 1 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1 )
+        vec4( -0.8 + 0.15 + (0.2*col), -0.8 + ((0.2) * row) + 0.05 ,  0.25, 1 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 )
     ];
 
     return rookVertices;
@@ -1440,14 +1474,14 @@ function calculateRookVertices(xLoc, yLoc){
 
 function drawRook() {
 	
-    var rookXLoc = 0;
-    var rookYLoc = 0;
+    var rookcol = 0;
+    var rookrow = 0;
     var rookVertices;
 	
     if (whitePieces[6]["inPlay"]){
-        rookXLoc = whitePieces[6]["location"][1];
-		rookYLoc = whitePieces[6]["location"][0];
-        rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
+        rookcol = whitePieces[6]["location"][1];
+		rookrow = whitePieces[6]["location"][0];
+        rookVertices = calculateRookVertices(rookcol, rookrow);
 
         
         quad( 1, 0, 3, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1459,9 +1493,9 @@ function drawRook() {
     } 
 
     if (whitePieces[7]["inPlay"]){
-		rookXLoc = whitePieces[7]["location"][1];
-        rookYLoc = whitePieces[7]["location"][0];
-        rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
+		rookcol = whitePieces[7]["location"][1];
+        rookrow = whitePieces[7]["location"][0];
+        rookVertices = calculateRookVertices(rookcol, rookrow);
 
         
         quad( 1, 0, 3, 2, rookVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1474,10 +1508,10 @@ function drawRook() {
     }
 
     if (blackPieces[6]["inPlay"]){
-        rookXLoc = blackPieces[6]["location"][1];
-        rookYLoc = blackPieces[6]["location"][0];
+        rookcol = blackPieces[6]["location"][1];
+        rookrow = blackPieces[6]["location"][0];
 
-        rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
+        rookVertices = calculateRookVertices(rookcol, rookrow);
 
         quad( 1, 0, 3, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 2, 3, 7, 6, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1489,10 +1523,10 @@ function drawRook() {
     }
 
     if (blackPieces[7]["inPlay"]){
-        rookXLoc = blackPieces[7]["location"][1];
-        rookYLoc = blackPieces[7]["location"][0];
+        rookcol = blackPieces[7]["location"][1];
+        rookrow = blackPieces[7]["location"][0];
 
-        rookVertices = calculateRookVertices(rookXLoc, rookYLoc);
+        rookVertices = calculateRookVertices(rookcol, rookrow);
 
         quad( 1, 0, 3, 2, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
         quad( 2, 3, 7, 6, rookVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1503,30 +1537,30 @@ function drawRook() {
     }
 }
 
-function calculatePawnVertices(xLoc, yLoc){
+function calculatePawnVertices(col, row){
     var pawnVertices = [
-        vec4( -0.8 + 0.15 + (0.2*xLoc), -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15,  0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05,  0.15, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 ),
-        vec4( -0.8 + ((0.2) * xLoc) + 0.15,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05,  -0.8 + ((0.2) * yLoc) + 0.15, 0.05, 1.0 ),
-        vec4( - 0.8 + ((0.2) * xLoc) + 0.05, -0.8 + ((0.2) * yLoc) + 0.05, 0.05, 1.0 )
+        vec4( -0.8 + 0.15 + (0.2*col), -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 )
     ];
 
     return pawnVertices;
 }
 function drawPawn() {
-    var pawnXLoc = 0;
-    var pawnYLoc = 0;
+    var pawncol = 0;
+    var pawnrow = 0;
     var pawnVertices;
 
     for (var i = 8; i < 16; i++){
         if (whitePieces[i]["inPlay"]){
-            pawnXLoc = whitePieces[i]["location"][1];
-            pawnYLoc = whitePieces[i]["location"][0];
-            pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
+            pawncol = whitePieces[i]["location"][1];
+            pawnrow = whitePieces[i]["location"][0];
+            pawnVertices = calculatePawnVertices(pawncol, pawnrow);
             
             quad( 1, 0, 3, 2, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
             quad( 2, 3, 7, 6, pawnVertices, vec4(1.0, 1.0, 1.0, 1.0) );
@@ -1537,10 +1571,10 @@ function drawPawn() {
 
         }
         if (blackPieces[i]["inPlay"]){
-            pawnXLoc = blackPieces[i]["location"][1];
-            pawnYLoc = blackPieces[i]["location"][0];
+            pawncol = blackPieces[i]["location"][1];
+            pawnrow = blackPieces[i]["location"][0];
 
-            pawnVertices = calculatePawnVertices(pawnXLoc, pawnYLoc);
+            pawnVertices = calculatePawnVertices(pawncol, pawnrow);
 
             quad( 1, 0, 3, 2, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
             quad( 2, 3, 7, 6, pawnVertices, vec4(0.0, 0.0, 0.0, 1.0) );
@@ -1582,7 +1616,7 @@ function render(  )
         ctMatrix = mult(ortho(-1, 1, -1, 1, -1, 1), m_inc);
     }
 		//console.log("CHECKPOINT 2");
-    gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix));
+    gl.uniformMatrix4fv(u_ctMatricol, false, flatten(ctMatrix));
 	
 	/*
 	gl.bindTexture( gl.TEXTURE_2D, texture );     /////////////// ?
