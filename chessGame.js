@@ -3,7 +3,6 @@
 var canvas;
 var gl;
 
-
 var turn = "white"; // start with white's turn
 var previousTurn = "black";
 var done = false;
@@ -20,6 +19,7 @@ var points = [];
 var colors = [];
 var texCoordsArray = [];
 
+var framePoints = [];
 var boardPoints = [];
 var whitePoints = [];
 var blackPoints = [];
@@ -27,11 +27,13 @@ var guidePoints = [];
 
 
 var colors = [];
+var frameColors = [];
 var boardColors = [];
 var whiteColors = [];
 var blackColors = [];
 var guideColors = [];
 
+var texFrameCoordsArray = [];
 var texBoardCoordsArray = [];
 var texWhiteCoordsArray = [];
 var texBlackCoordsArray = [];
@@ -42,6 +44,7 @@ var boardTexture;
 var whiteTexture;
 var guideTexture;
 var blackTexture;
+var frameTexture;
 
 var texCoord = [
     vec2(0, 0),
@@ -55,10 +58,10 @@ var ctMatrix;
 var u_ctMatrixLoc;
 
 var a_vColorLoc;
-var cBuffer, vBuffer, vBoardBuffer, vWhiteBuffer, vBlackBuffer, vGuideBuffer;
-var tBoardBuffer, tWhiteBuffer, tBlackBuffer, tGuideBuffer;
-var cBoardBuffer, cWhiteBuffer, cBlackBuffer, cGuideBuffer;
-var  a_vTextureCoordLoc;
+var vBoardBuffer, vWhiteBuffer, vBlackBuffer, vGuideBuffer, vFrameBuffer;
+var tBoardBuffer, tWhiteBuffer, tBlackBuffer, tGuideBuffer, tFrameBuffer;
+var cBoardBuffer, cWhiteBuffer, cBlackBuffer, cGuideBuffer, cFrameBuffer;
+var a_vTextureCoordLoc;
 var u_textureSamplerLoc
 
 // for trackball
@@ -390,7 +393,7 @@ window.onload = function init()
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 0.8, 0.8, 0.8, 1.0 );
+    gl.clearColor( 53/255, 105/255, 74/255, 1.0 );
 
     gl.enable(gl.DEPTH_TEST);
 
@@ -410,9 +413,9 @@ window.onload = function init()
     cBoardBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBoardBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(boardColors), gl.STATIC_DRAW );
-   a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
-   gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
-   gl.enableVertexAttribArray( a_vColorLoc );
+    a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
+    gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( a_vColorLoc );
 	
     cWhiteBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cWhiteBuffer );
@@ -425,7 +428,10 @@ window.onload = function init()
     cGuideBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cGuideBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(guideColors), gl.STATIC_DRAW );
-    a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
+
+    cFrameBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cFrameBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(frameColors), gl.STATIC_DRAW );
 
 	// VERTEX BUFFERS
     vBoardBuffer = gl.createBuffer();
@@ -446,6 +452,10 @@ window.onload = function init()
     vGuideBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vGuideBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(guidePoints), gl.STATIC_DRAW );
+	
+    vFrameBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vFrameBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(framePoints), gl.STATIC_DRAW );
 	
   
     u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
@@ -469,6 +479,10 @@ window.onload = function init()
     tGuideBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, tGuideBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(texGuideCoordsArray), gl.STATIC_DRAW ); 
+	
+    tFrameBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tFrameBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texFrameCoordsArray), gl.STATIC_DRAW ); 
     
     a_vTextureCoordLoc = gl.getAttribLocation( program, "a_vTextureCoord" );
     gl.vertexAttribPointer( a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0 );
@@ -510,7 +524,13 @@ window.onload = function init()
        configureTexture( guideTexture);
    	}
   	guideTexture.image.src = "Chess_Board.png";
-   
+	
+	frameTexture = gl.createTexture();
+    frameTexture.image = new Image();
+  	frameTexture.image.onload = function() {
+       configureTexture( frameTexture);
+   	}
+  	frameTexture.image.src = "wood_frame.jpeg";
    
    
     // for trackball
@@ -547,15 +567,20 @@ window.onload = function init()
 		whitePoints = [];
 		blackPoints = [];
 		guidePoints = [];
+		framePoints = [];
+		
 		boardColors = [];
 		whiteColors = [];
 		blackColors = [];
 		guideColors = [];
+		frameColors = [];
 
 		texBoardCoordsArray = [];
 		texWhiteCoordsArray = [];
 		texBlackCoordsArray = [];
 		texGuideCoordsArray = [];
+		texFrameCoordsArray = [];
+		
 		truth = movePiece( );
         position = m_curquat;
         theta = theta;
@@ -566,10 +591,40 @@ window.onload = function init()
 
     document.getElementById("moves").onclick = function(){
 	    var pName = document.getElementById("id_chess_piece").value;
-        showGuide(pName);
+        boardPoints = [];
+		whitePoints = [];
+		blackPoints = [];
+		guidePoints = [];
+		framePoints = [];
+		
+		boardColors = [];
+		whiteColors = [];
+		blackColors = [];
+		guideColors = [];
+		frameColors = [];
+
+		texBoardCoordsArray = [];
+		texWhiteCoordsArray = [];
+		texBlackCoordsArray = [];
+		texGuideCoordsArray = [];
+		texFrameCoordsArray = [];
+		
+		
+	
         position = m_curquat;
         theta = theta;
-        init();
+	    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+		init();
+		
+		
+        showGuide(pName);
+		drawGuide(guideTexture, vec4(0.0, 1.0, 0.0, 1.0));
+		console.log(guidePoints);
+		console.log(guideColors);
+		console.log(texGuideCoordsArray);
+		console.log("CHECKING");
+
+
 	}
 }
 
@@ -580,15 +635,14 @@ function showGuide(pieceName){
         for (var k=0; k<16; k++){
             if (whitePieces[k]["name"] == pieceName){
                 possibleMoves = playBook(whitePieces[k]);
-                console.log(possibleMoves.length);
                 for (var p=0; p<possibleMoves.length; p++){
                     spaceVertices = highlightMoves(possibleMoves[p][0], possibleMoves[p][1]);
-                    quad( 1, 0, 3, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 2, 3, 7, 6, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 3, 0, 4, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 6, 5, 1, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 4, 5, 6, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 5, 4, 0, 1, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 1, 0, 3, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 2, 3, 7, 6, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 3, 0, 4, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 6, 5, 1, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 4, 5, 6, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 5, 4, 0, 1, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     NumVertices += 6;
                 }
             }
@@ -597,20 +651,18 @@ function showGuide(pieceName){
         for (var k=0; k<16; k++){
             if (blackPieces[k]["name"] == pieceName){
                 possibleMoves = playBook(blackPieces[k]);
-                console.log(possibleMoves.length);
                 var count = 0;
                 for (var p=0; p<possibleMoves.length; p++){
                     spaceVertices = highlightMoves(possibleMoves[p][0], possibleMoves[p][1]);
-                    quad( 1, 0, 3, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 2, 3, 7, 6, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 3, 0, 4, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 6, 5, 1, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 4, 5, 6, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
-                    quad( 5, 4, 0, 1, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 1, 0, 3, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 2, 3, 7, 6, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 3, 0, 4, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 6, 5, 1, 2, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 4, 5, 6, 7, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
+                    guideQuad( 5, 4, 0, 1, spaceVertices, vec4(1.0, 1.0, 0.0, 1.0) );
                     NumVertices += 6;
                     count ++;
                 }
-                console.log(count);
             }
         }
     }
@@ -655,7 +707,6 @@ function checkIfPiece(col, row, color) {
            	 	// there is a piece in that location, but it is the same color as your team (white piece in that spot and you are white)
             	result = 2;
         	}
-
 		}
 		else{ // you are black
        	 	if (whitePieces[i]["location"][0] == row && whitePieces[i]["location"][1] == col && whitePieces[i]["inPlay"]){
@@ -665,8 +716,7 @@ function checkIfPiece(col, row, color) {
        	 	else if (blackPieces[i]["location"][0] == row && blackPieces[i]["location"][1] == col && blackPieces[i]["inPlay"]){
            	 	// there is a piece in that location, but it is the same color as your team (black piece in that spot and you are black)
            	 	result = 2;
-      	  	}
-
+      	 	}
 		}
     }
 	return result;
@@ -1126,49 +1176,34 @@ function playBook(piece) {
 function createBoard()
 {
     boardQuad( 1, 0, 3, 2, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-    boardQuad( 2, 3, 7, 6, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-    boardQuad( 3, 0, 4, 7, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-    boardQuad( 6, 5, 1, 2, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-    boardQuad( 4, 5, 6, 7, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-    boardQuad( 5, 4, 0, 1, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
-
+    frameQuad( 2, 3, 7, 6, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+    frameQuad( 3, 0, 4, 7, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+    frameQuad( 6, 5, 1, 2, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+    frameQuad( 4, 5, 6, 7, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+    frameQuad( 5, 4, 0, 1, boardVertices, vec4(1.0, 1.0, 1.0, 1.0) );
 }
 
 function drawGuide(texture, color){
     // set uniforms
-    //gl.uniform3fv( u_colorLoc, color );
-    //mvMatrix = mult(commonMVMatrix, nonCommonMVMatrix);
     gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix) );
 
-   // var nMatrix = normalMatrix(ctMatrix, true); // return 3 by 3 normal matrix
-    //gl.uniformMatrix3fv(u_nMatrixLoc, false, flatten(nMatrix) );
-  
 	gl.enableVertexAttribArray( a_vColorLoc );
 	gl.bindBuffer( gl.ARRAY_BUFFER, cGuideBuffer );
 	gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
-		// modified by Chaoli
-    //gl.enableVertexAttribArray( a_normalLoc );
-    //gl.bindBuffer(gl.ARRAY_BUFFER, normalBuffer);
-    //gl.vertexAttribPointer(a_normalLoc, 3, gl.FLOAT, false, 0, 0);
-
 
 	gl.bindTexture( gl.TEXTURE_2D, texture );
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tGuideBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
-
-    //gl.bindBuffer(gl.ARRAY_BUFFER, vGuideBuffer);
 	
 	gl.enableVertexAttribArray( a_vPositionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, vGuideBuffer);
     gl.vertexAttribPointer(a_vPositionLoc, 4, gl.FLOAT, false, 0, 0);
     gl.drawArrays(gl.TRIANGLES, 0, guidePoints.length);
-		console.log(guidePoints.length);
 }
 
 function drawBlack(texture, color){
     // set uniforms
-
     gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix) );
     
 	gl.enableVertexAttribArray( a_vColorLoc );
@@ -1224,8 +1259,8 @@ function drawBoard(texture, color){
     gl.vertexAttribPointer(a_vPositionLoc, 4, gl.FLOAT, false, 0, 0);
 	
     gl.drawArrays(gl.TRIANGLES, 0, boardPoints.length);
-	
 }
+
 function boardQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
@@ -1247,6 +1282,51 @@ function boardQuad(a, b, c, d, vertices, color)
 		}
 		else if ( i == 5){ //d
 			texBoardCoordsArray.push(texCoord[2]);
+		}
+    }
+}
+
+function drawFrame(texture, color){
+    // set uniforms
+    gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix) );
+
+  	gl.enableVertexAttribArray( a_vColorLoc );
+    gl.bindBuffer( gl.ARRAY_BUFFER, cFrameBuffer );
+	gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
+
+	gl.bindTexture( gl.TEXTURE_2D, texture );
+    gl.enableVertexAttribArray( a_vTextureCoordLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, tFrameBuffer);
+    gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+	
+    gl.enableVertexAttribArray( a_vPositionLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, vFrameBuffer);
+    gl.vertexAttribPointer(a_vPositionLoc, 4, gl.FLOAT, false, 0, 0);
+	
+    gl.drawArrays(gl.TRIANGLES, 0, framePoints.length);
+}
+
+function frameQuad(a, b, c, d, vertices, color)
+{
+    var indices = [ a, b, c, a, c, d ];
+
+    for ( var i = 0; i < indices.length; ++i ) {
+        framePoints.push( vertices[indices[i]] );
+        frameColors.push( color );
+    }
+	
+    for ( var i = 0; i < 6; ++i ) {
+		if ( i == 0 || i == 3) { //a
+			texFrameCoordsArray.push(texCoord[1]);
+		}
+		else if ( i == 1) { //b
+			texFrameCoordsArray.push(texCoord[0]);
+		}
+		else if ( i == 2 || i == 4){ //c
+			texFrameCoordsArray.push(texCoord[3]);
+		}
+		else if ( i == 5){ //d
+			texFrameCoordsArray.push(texCoord[2]);
 		}
     }
 }
@@ -1400,13 +1480,23 @@ function calculateQueenVertices(col, row){
 
         vec4( -0.8 + 0.15 + (0.2*col), -0.8 + ((0.2) * row) + 0.05 ,  0.35, 1 ), // TBR
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1 ), //TFR
-        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1 ), //TFL
-        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1 ), // TBL
+        vec4( -0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1 ), //TFL
+        vec4( -0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1 ), // TBL
     
         vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ), // BR
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ), //FR
-        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ), //FL
-        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ), //BL
+        vec4( -0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ), //FL
+        vec4( -0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ), //BL
+		
+    	//triangle
+   		vec4( -0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.10,  0.35, 1.0 ),
+   		vec4( -0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+   		vec4( -0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.10,  0.35, 1.0 ),
+   		vec4( -0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 ),
+   		vec4( -0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.25, 1.0 ),
+   		vec4( -0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.25, 1.0 ),
+   		vec4( -0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15, 0.30, 1.0 ),
+   	  	vec4( -0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05, 0.30, 1.0 )
     ];
 
     return queenVertices;
@@ -1429,6 +1519,13 @@ function drawQueen() {
         whiteQuad( 6, 5, 1, 2, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
         whiteQuad( 4, 5, 6, 7, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
         whiteQuad( 5, 4, 0, 1, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+		
+        whiteQuad( 9, 8, 11, 10, queenVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        whiteQuad( 10, 11, 15, 14, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        whiteQuad( 11, 8, 12, 15, queenVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        whiteQuad( 14, 13, 9, 10, queenVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        whiteQuad( 12, 13, 14, 15, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        whiteQuad( 13, 12, 8, 9, queenVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
     }
 
     if (blackPieces[1]["inPlay"]){
@@ -1442,6 +1539,13 @@ function drawQueen() {
         blackQuad( 6, 5, 1, 2, queenVertices, vec4(0.99, 0.99, 0.98, 1.0) );
         blackQuad( 4, 5, 6, 7, queenVertices, vec4(0.99, 0.99, 0.98, 1.0) );
         blackQuad( 5, 4, 0, 1, queenVertices, vec4(0.99, 0.99, 0.98, 1.0) );
+		
+        blackQuad( 9, 8, 11, 10, queenVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
+        blackQuad( 10, 11, 15, 14, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        blackQuad( 11, 8, 12, 15, queenVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        blackQuad( 14, 13, 9, 10, queenVertices,  vec4(1.0, 1.0, 1.0, 1.0) );
+        blackQuad( 12, 13, 14, 15, queenVertices, vec4(1.0, 1.0, 1.0, 1.0) );
+        blackQuad( 13, 12, 8, 9, queenVertices,   vec4(1.0, 1.0, 1.0, 1.0) );
     }
 }
 
@@ -1829,11 +1933,12 @@ function drawAll(){
     }
     // orthogonal projection matrix * trackball rotation matrix
     else {
-        ctMatrix = mult(ortho(-1, 1, -1, 1, -1, 1), m_inc);
+        ctMatrix = mult(ortho(-1.15, 1.15, -1.15, 1.15, -1.15, 1.15), m_inc);
     }
 	
 	gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix));
 	drawBoard(boardTexture, vec4(1.0, 1.0, 1.0, 1.0));
+	drawFrame(frameTexture, vec4(1.0, 1.0, 1.0, 1.0));
     drawPieces();
 }
 
