@@ -452,7 +452,6 @@ window.onload = function init()
 	
     vGuideBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vGuideBuffer );
-    console.log("guide points: ", guidePoints.length);
     gl.bufferData( gl.ARRAY_BUFFER, flatten(guidePoints), gl.STATIC_DRAW );
 	
     vFrameBuffer = gl.createBuffer();
@@ -480,7 +479,6 @@ window.onload = function init()
 	
     tGuideBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, tGuideBuffer );
-    console.log("length: ", texGuideCoordsArray.length);
     gl.bufferData( gl.ARRAY_BUFFER, flatten(texGuideCoordsArray), gl.STATIC_DRAW ); 
 	
     tFrameBuffer = gl.createBuffer();
@@ -651,8 +649,6 @@ window.onload = function init()
 		console.log(guideColors);
 		console.log("guide ", texGuideCoordsArray);
 		console.log("CHECKING");
-
-
 	}
 }
 
@@ -1218,7 +1214,6 @@ function drawGuide(texture, color){
 	gl.enableVertexAttribArray( a_vColorLoc );
 	gl.bindBuffer( gl.ARRAY_BUFFER, cGuideBuffer );
 	gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
-
 	gl.bindTexture( gl.TEXTURE_2D, texture );
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tGuideBuffer);
@@ -1313,6 +1308,76 @@ function boardQuad(a, b, c, d, vertices, color)
 		}
     }
 }
+
+function drawFrame(texture, color){
+    // set uniforms
+    gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix) );
+
+  	gl.enableVertexAttribArray( a_vColorLoc );
+    gl.bindBuffer( gl.ARRAY_BUFFER, cFrameBuffer );
+	gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
+
+	gl.bindTexture( gl.TEXTURE_2D, texture );
+    gl.enableVertexAttribArray( a_vTextureCoordLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, tFrameBuffer);
+    gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+	
+    gl.enableVertexAttribArray( a_vPositionLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, vFrameBuffer);
+    gl.vertexAttribPointer(a_vPositionLoc, 4, gl.FLOAT, false, 0, 0);
+	
+    gl.drawArrays(gl.TRIANGLES, 0, framePoints.length);
+}
+
+function frameQuad(a, b, c, d, vertices, color)
+{
+    var indices = [ a, b, c, a, c, d ];
+
+    for ( var i = 0; i < indices.length; ++i ) {
+        framePoints.push( vertices[indices[i]] );
+        frameColors.push( color );
+    }
+	
+    for ( var i = 0; i < 6; ++i ) {
+		if ( i == 0 || i == 3) { //a
+			texFrameCoordsArray.push(texCoord[1]);
+		}
+		else if ( i == 1) { //b
+			texFrameCoordsArray.push(texCoord[0]);
+		}
+		else if ( i == 2 || i == 4){ //c
+			texFrameCoordsArray.push(texCoord[3]);
+		}
+		else if ( i == 5){ //d
+			texFrameCoordsArray.push(texCoord[2]);
+		}
+    }
+}
+
+function whiteQuad(a, b, c, d, vertices, color)
+{
+    var indices = [ a, b, c, a, c, d ];
+
+    for ( var i = 0; i < indices.length; ++i ) {
+        whitePoints.push( vertices[indices[i]] );
+        whiteColors.push( color );
+    }
+    for ( var i = 0; i < 6; ++i ) {
+		if ( i == 0 || i == 3) { //a
+			texWhiteCoordsArray.push(texCoord[1]);
+		}
+		else if ( i == 1) { //b
+			texWhiteCoordsArray.push(texCoord[0]);
+		}
+		else if ( i == 2 || i == 4){ //c
+			texWhiteCoordsArray.push(texCoord[3]);
+		}
+		else if ( i == 5){ //d
+			texWhiteCoordsArray.push(texCoord[2]);
+		}
+    }
+}
+
 
 function drawFrame(texture, color){
     // set uniforms
