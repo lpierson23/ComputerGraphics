@@ -5,15 +5,15 @@ var gl;
 
 var turn = "white"; // start with white's turn
 var previousTurn = "black";
-var done = false;
 
 var NumVertices  = 36;
 
 var rotate = false;
 var truth;
-
 var theta = 0.0;
 var u_thetaLoc;
+
+var gameStatus = '';
 
 var points = [];
 var colors = [];
@@ -219,19 +219,302 @@ var boardVertices = [
                 vec4(  0.8, -0.8, -0.05, 1.0 )
                 ];
 
-var vertexColors = [
-                    [ 0.0, 0.0, 0.0, 1.0 ],  // black
-                    [ 1.0, 0.0, 0.0, 1.0 ],  // red
-                    [ 1.0, 1.0, 0.0, 1.0 ],  // yellow
-                    [ 0.0, 1.0, 0.0, 1.0 ],  // green
-                    [ 0.0, 0.0, 1.0, 1.0 ],  // blue
-                    [ 1.0, 0.0, 1.0, 1.0 ],  // magenta
-                    [ 1.0, 1.0, 1.0, 1.0 ],  // white
-                    [ 0.0, 1.0, 1.0, 1.0 ]   // cyan
-                    ];
+window.onload = function init()
+{
+    canvas = document.getElementById( "gl-canvas" );
+
+    gl = WebGLUtils.setupWebGL( canvas );
+    if ( !gl ) { alert( "WebGL isn't available" ); }
+
+    // canvas.style.position = "relative"; // set position to relative to allow positioning
+    // canvas.style.top = "10px"; // move the canvas down by 10 pixels
+    // canvas.style.left = "10px"; // move the canvas to the right by 10 pixels
+
+    // const ctx = canvas.getContext("webgl");
+
+    gl.viewport( 0, 0, canvas.width, canvas.height );
+    gl.clearColor( canvasColor[0], canvasColor[1], canvasColor[2], canvasColor[3] );
+
+    gl.enable(gl.DEPTH_TEST);
+
+    // for trackball
+    m_curquat = position;
+    NumVertices = 0;
+    
+    //  Load shaders and initialize attribute buffers
+    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    gl.useProgram( program );
+    
+    createBoard();
+    createAll();
+
+    // COLOR BUFFERS
+    cBoardBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cBoardBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(boardColors), gl.STATIC_DRAW );
+    a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
+    gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( a_vColorLoc );
+    
+    cWhiteBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cWhiteBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(whiteColors), gl.STATIC_DRAW );
+    
+    cBlackBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cBlackBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(blackColors), gl.STATIC_DRAW );
+    
+    cGuideBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cGuideBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(guideColors), gl.STATIC_DRAW );
+
+    cFrameBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, cFrameBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(frameColors), gl.STATIC_DRAW );
+
+    // VERTEX BUFFERS
+    vBoardBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBoardBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(boardPoints), gl.STATIC_DRAW ); 
+        a_vPositionLoc = gl.getAttribLocation( program, "a_vPosition" );
+    gl.vertexAttribPointer( a_vPositionLoc, 4, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( a_vPositionLoc );
+    
+    vWhiteBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vWhiteBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(whitePoints), gl.STATIC_DRAW );
+    
+    vBlackBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vBlackBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(blackPoints), gl.STATIC_DRAW );
+    
+    vGuideBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vGuideBuffer );
+    //console.log("guide points: ", guidePoints.length);
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(guidePoints), gl.STATIC_DRAW );
+    
+    vFrameBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, vFrameBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(framePoints), gl.STATIC_DRAW );
+    
+    
+    u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
+    
+    
+    // send texture coordiantes data down to the GPU
+    // to be implemented
+    // TEXTURE BUFFERS
+    tBoardBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBoardBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texBoardCoordsArray), gl.STATIC_DRAW ); ///??
+    
+    tWhiteBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tWhiteBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texWhiteCoordsArray), gl.STATIC_DRAW ); 
+    
+    tBlackBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tBlackBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texBlackCoordsArray), gl.STATIC_DRAW ); 
+    
+    tGuideBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tGuideBuffer );
+    //console.log("length: ", texGuideCoordsArray.length);
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texGuideCoordsArray), gl.STATIC_DRAW ); 
+    
+    tFrameBuffer = gl.createBuffer();
+    gl.bindBuffer( gl.ARRAY_BUFFER, tFrameBuffer );
+    gl.bufferData( gl.ARRAY_BUFFER, flatten(texFrameCoordsArray), gl.STATIC_DRAW ); 
+    
+    a_vTextureCoordLoc = gl.getAttribLocation( program, "a_vTextureCoord" );
+    gl.vertexAttribPointer( a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0 );
+    gl.enableVertexAttribArray( a_vTextureCoordLoc );
+
+    // activate the texture and specify texture sampler
+    // to be implemented
+    gl.activeTexture(gl.TEXTURE0);
+    u_textureSamplerLoc = gl.getUniformLocation( program, "u_textureSampler" );
+    gl.uniform1i(u_textureSamplerLoc, 0);  /////////////////////////////////////
+    
+
+    // INITIALIZE TEXTURES
+    boardTexture = gl.createTexture();
+    boardTexture.image = new Image();
+    boardTexture.image.onload = function() {
+        configureTexture( boardTexture);
+    }
+    boardTexture.image.src = "marble_board.jpeg";
+
+    
+    whiteTexture = gl.createTexture();
+        whiteTexture.image = new Image();
+        whiteTexture.image.onload = function() {
+        configureTexture( whiteTexture);
+        }
+        whiteTexture.image.src = "whiteMarble.png";
+
+    blackTexture = gl.createTexture();
+        blackTexture.image = new Image();
+        blackTexture.image.onload = function() {
+            configureTexture( blackTexture);
+        }
+        blackTexture.image.src = "blackMarble.png";
+
+    guideTexture = gl.createTexture();
+    guideTexture.image = new Image();
+        guideTexture.image.onload = function() {
+        configureTexture( guideTexture);
+        }
+        guideTexture.image.src = "Chess_Board.png";
+    
+    frameTexture = gl.createTexture();
+    frameTexture.image = new Image();
+        frameTexture.image.onload = function() {
+        configureTexture( frameTexture);
+        }
+        frameTexture.image.src = "wood_frame.jpeg";
+    
+    
+    // for trackball
+    canvas.addEventListener("mousedown", function(event){
+        m_mousex = event.clientX - event.target.getBoundingClientRect().left;
+        m_mousey = event.clientY - event.target.getBoundingClientRect().top;
+        trackballMove = true;
+    });
+
+    // for trackball
+    canvas.addEventListener("mouseup", function(event){
+        trackballMove = false;
+    });
+
+    // for trackball
+    canvas.addEventListener("mousemove", function(event){
+        if (trackballMove) {
+        var x = event.clientX - event.target.getBoundingClientRect().left;
+        var y = event.clientY - event.target.getBoundingClientRect().top;
+        mouseMotion(x, y);
+        }
+    } );
+
+    document.getElementById("rotate").onclick = function(){
+        rotate = true;
+    };
+
+    u_thetaLoc = gl.getUniformLocation(program, "u_theta");
+
+    render( );
+
+    document.getElementById("changeColor").onclick = function(){
+        var backgroundColor = document.getElementById("backgroundColor").value;
+        switch (backgroundColor) {
+            case "red": 
+                canvasColor = vec4(139/255, 0/255, 0/255, 1.0 );
+                break;
+            case "green": 
+                canvasColor = vec4( 53/255, 105/255, 74/255, 1.0 );
+                break;
+            case "blue": 
+                canvasColor = vec4( 72/255, 61/255,139/255, 1.0 );
+                break;
+            case "purple":
+                canvasColor = vec4( 128/255, 0/255, 128/255, 1.0 );
+                break;
+            case "gold":
+                canvasColor = vec4( 255/255, 215/255, 0/255, 1.0 );
+                break;
+            default: 
+                canvasColor = vec4( 53/255, 105/255, 74/255, 1.0 );
+                break;
+        }
+        init();
+    }
+
+    document.getElementById("submit").onclick = function(){
+        boardPoints = [];
+        whitePoints = [];
+        blackPoints = [];
+        guidePoints = [];
+        framePoints = [];
+        
+        boardColors = [];
+        whiteColors = [];
+        blackColors = [];
+        guideColors = [];
+        frameColors = [];
+
+        texBoardCoordsArray = [];
+        texWhiteCoordsArray = [];
+        texBlackCoordsArray = [];
+        texGuideCoordsArray = [];
+        texFrameCoordsArray = [];
+        
+        truth = movePiece( );
+        position = m_curquat;
+        theta = theta;
+        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        init();
+        console.log(checkWin(turn));
+        var result = checkWin(turn);
+        if(result == "Black Wins!" || result == "White Wins!"){
+            //alert(result + " Press Okay to Play again!");
+            if (confirm(result + " Press Okay to Play again!")){
+                console.log("restart game");
+                location.reload();
+            }
+        } else if(result != "Resume Play"){
+            gameStatus = result;
+        } else {
+            gameStatus = "";
+        }
+    }
+
+    document.getElementById("moves").onclick = function(){
+        var pName = document.getElementById("id_chess_piece").value;
+        boardPoints = [];
+        whitePoints = [];
+        blackPoints = [];
+        guidePoints = [];
+        framePoints = [];
+        
+        boardColors = [];
+        whiteColors = [];
+        blackColors = [];
+        guideColors = [];
+        frameColors = [];
+
+        texBoardCoordsArray = [];
+        texWhiteCoordsArray = [];
+        texBlackCoordsArray = [];
+        texGuideCoordsArray = [];
+        texFrameCoordsArray = [];
+        
+        
+    
+        position = m_curquat;
+        theta = theta;
+        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        init();
+        
+        
+        showGuide(pName);
+        drawGuide(guideTexture, vec4(0.0, 1.0, 0.0, 1.0));
+        console.log(guidePoints);
+        console.log(guideColors);
+        console.log("guide ", texGuideCoordsArray);
+        console.log("CHECKING");
+
+
+    }
+}
+
+function restartGame(){
+
+}
 
 function drawTurn() {
     var string = turn + "'s turn!"
+    if (gameStatus != ''){
+        string = string + " - " + gameStatus;
+    } 
     whosTurn.innerHTML = string;
 }
 
@@ -267,8 +550,8 @@ function movePiece(){
 	var i;
 
 		if (turn == "white"){
-			console.log("moving WHITE ");
-			console.log("pRow "+pRow+" pCol "+pCol);
+			//console.log("moving WHITE ");
+			//console.log("pRow "+pRow+" pCol "+pCol);
 
 			for (var k=0; k<16; k++){
 				
@@ -294,10 +577,10 @@ function movePiece(){
 							}
 						}
 						whitePieces[i]["location"] = [pRow, pCol];
-                        console.log("colors and points ", colors.length, points.length);
+                        //console.log("colors and points ", colors.length, points.length);
                         pieceTaken(whitePieces[i]["location"], "white");
-                        console.log("colors and points ", colors.length, points.length);
-                        console.log(whitePieces, blackPieces);
+                        //console.log("colors and points ", colors.length, points.length);
+                        //console.log(whitePieces, blackPieces);
 						turn = "black";
                         previousTurn = "white";
                         rotate = true;
@@ -308,7 +591,7 @@ function movePiece(){
 			}
 		}
 		else{ // black's turn
-			console.log("moving BLACK ");
+			//console.log("moving BLACK ");
 			for (var k=0; k<16; k++){
 				if (blackPieces[k]["name"] == pName){
 					possibleMoves = playBook(blackPieces[k]);
@@ -324,7 +607,7 @@ function movePiece(){
 						}
 					}
 					
-					console.log("include? " + includes);
+					//console.log("include? " + includes);
 					if (includes == true){
 						
 						for (var p=0; p<blackPieces.length; p++){
@@ -335,10 +618,10 @@ function movePiece(){
 						}
 
 						blackPieces[i]["location"] = [pRow, pCol];
-                        console.log("colors and points ", colors.length, points.length);
+                        //console.log("colors and points ", colors.length, points.length);
                         pieceTaken(blackPieces[i]["location"], "black");
-                        console.log("colors and points ", colors.length, points.length);
-                        console.log(whitePieces, blackPieces);
+                        //console.log("colors and points ", colors.length, points.length);
+                        //console.log(whitePieces, blackPieces);
 						turn = "white";
                         previousTurn = "black;"
                         rotate = true;
@@ -347,7 +630,7 @@ function movePiece(){
 				}	
 			}
 		}
-		console.log("MOVE PIECE FALSE");
+		//console.log("MOVE PIECE FALSE");
 
         previousTurn = turn;
 	return false;
@@ -386,275 +669,7 @@ function mouseMotion( x,  y)
         }
 }
 
-window.onload = function init()
-{
-    canvas = document.getElementById( "gl-canvas" );
 
-    gl = WebGLUtils.setupWebGL( canvas );
-    if ( !gl ) { alert( "WebGL isn't available" ); }
-
-    gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( canvasColor[0], canvasColor[1], canvasColor[2], canvasColor[3] );
-
-    gl.enable(gl.DEPTH_TEST);
-
-    // for trackball
-    m_curquat = position;
-    NumVertices = 0;
-    console.log("m_curquat", m_curquat);
- 
-    //  Load shaders and initialize attribute buffers
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
-    gl.useProgram( program );
-	
-    createBoard();
-	createAll();
-
-	// COLOR BUFFERS
-    cBoardBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBoardBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(boardColors), gl.STATIC_DRAW );
-    a_vColorLoc = gl.getAttribLocation( program, "a_vColor" );
-    gl.vertexAttribPointer( a_vColorLoc, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( a_vColorLoc );
-	
-    cWhiteBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cWhiteBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(whiteColors), gl.STATIC_DRAW );
-	
-    cBlackBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBlackBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(blackColors), gl.STATIC_DRAW );
-	
-    cGuideBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cGuideBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(guideColors), gl.STATIC_DRAW );
-
-    cFrameBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cFrameBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(frameColors), gl.STATIC_DRAW );
-
-	// VERTEX BUFFERS
-    vBoardBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBoardBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(boardPoints), gl.STATIC_DRAW ); 
-	    a_vPositionLoc = gl.getAttribLocation( program, "a_vPosition" );
-    gl.vertexAttribPointer( a_vPositionLoc, 4, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( a_vPositionLoc );
-  
-	vWhiteBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vWhiteBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(whitePoints), gl.STATIC_DRAW );
-	
-    vBlackBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBlackBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(blackPoints), gl.STATIC_DRAW );
-	
-    vGuideBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vGuideBuffer );
-    console.log("guide points: ", guidePoints.length);
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(guidePoints), gl.STATIC_DRAW );
-	
-    vFrameBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vFrameBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(framePoints), gl.STATIC_DRAW );
-	
-  
-    u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
-	
-	
-    // send texture coordiantes data down to the GPU
-    // to be implemented
-	// TEXTURE BUFFERS
-    tBoardBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, tBoardBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(texBoardCoordsArray), gl.STATIC_DRAW ); ///??
-	
-    tWhiteBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, tWhiteBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(texWhiteCoordsArray), gl.STATIC_DRAW ); 
-	
-    tBlackBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, tBlackBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(texBlackCoordsArray), gl.STATIC_DRAW ); 
-	
-    tGuideBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, tGuideBuffer );
-    console.log("length: ", texGuideCoordsArray.length);
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(texGuideCoordsArray), gl.STATIC_DRAW ); 
-	
-    tFrameBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, tFrameBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(texFrameCoordsArray), gl.STATIC_DRAW ); 
-    
-    a_vTextureCoordLoc = gl.getAttribLocation( program, "a_vTextureCoord" );
-    gl.vertexAttribPointer( a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( a_vTextureCoordLoc );
-
-    // activate the texture and specify texture sampler
-    // to be implemented
-    gl.activeTexture(gl.TEXTURE0);
-    u_textureSamplerLoc = gl.getUniformLocation( program, "u_textureSampler" );
-    gl.uniform1i(u_textureSamplerLoc, 0);  /////////////////////////////////////
-	
-
-    // INITIALIZE TEXTURES
-    boardTexture = gl.createTexture();
-    boardTexture.image = new Image();
-    boardTexture.image.onload = function() {
-        configureTexture( boardTexture);
-    }
-    boardTexture.image.src = "marble_board.jpeg";
-
- 
-	whiteTexture = gl.createTexture();
-   	whiteTexture.image = new Image();
-   	whiteTexture.image.onload = function() {
-       configureTexture( whiteTexture);
-  	}
-  	whiteTexture.image.src = "whiteMarble.png";
-
-	blackTexture = gl.createTexture();
-  	 blackTexture.image = new Image();
-   	blackTexture.image.onload = function() {
-   		configureTexture( blackTexture);
-   	}
-   	blackTexture.image.src = "blackMarble.png";
-
-	guideTexture = gl.createTexture();
-    guideTexture.image = new Image();
-  	guideTexture.image.onload = function() {
-       configureTexture( guideTexture);
-   	}
-  	guideTexture.image.src = "Chess_Board.png";
-	
-	frameTexture = gl.createTexture();
-    frameTexture.image = new Image();
-  	frameTexture.image.onload = function() {
-       configureTexture( frameTexture);
-   	}
-  	frameTexture.image.src = "wood_frame.jpeg";
-   
-   
-    // for trackball
-    canvas.addEventListener("mousedown", function(event){
-        m_mousex = event.clientX - event.target.getBoundingClientRect().left;
-        m_mousey = event.clientY - event.target.getBoundingClientRect().top;
-        trackballMove = true;
-    });
-
-    // for trackball
-    canvas.addEventListener("mouseup", function(event){
-        trackballMove = false;
-    });
-
-    // for trackball
-    canvas.addEventListener("mousemove", function(event){
-      if (trackballMove) {
-        var x = event.clientX - event.target.getBoundingClientRect().left;
-        var y = event.clientY - event.target.getBoundingClientRect().top;
-        mouseMotion(x, y);
-      }
-    } );
-
-    document.getElementById("rotate").onclick = function(){
-        rotate = true;
-    };
-
-    u_thetaLoc = gl.getUniformLocation(program, "u_theta");
-
-    render( );
-
-    document.getElementById("changeColor").onclick = function(){
-        var backgroundColor = document.getElementById("backgroundColor").value;
-        switch (backgroundColor) {
-            case "red": 
-                canvasColor = vec4(139/255, 0/255, 0/255, 1.0 );
-                break;
-            case "green": 
-                canvasColor = vec4( 53/255, 105/255, 74/255, 1.0 );
-                break;
-            case "blue": 
-                canvasColor = vec4( 72/255, 61/255,139/255, 1.0 );
-                break;
-            case "purple":
-                canvasColor = vec4( 128/255, 0/255, 128/255, 1.0 );
-                break;
-            case "gold":
-                canvasColor = vec4( 255/255, 215/255, 0/255, 1.0 );
-                break;
-            default: 
-                canvasColor = vec4( 53/255, 105/255, 74/255, 1.0 );
-                break;
-        }
-        init();
-    }
-
-	document.getElementById("submit").onclick = function(){
-        boardPoints = [];
-		whitePoints = [];
-		blackPoints = [];
-		guidePoints = [];
-		framePoints = [];
-		
-		boardColors = [];
-		whiteColors = [];
-		blackColors = [];
-		guideColors = [];
-		frameColors = [];
-
-		texBoardCoordsArray = [];
-		texWhiteCoordsArray = [];
-		texBlackCoordsArray = [];
-		texGuideCoordsArray = [];
-		texFrameCoordsArray = [];
-		
-		truth = movePiece( );
-        position = m_curquat;
-        theta = theta;
-        gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		init();
-        console.log(checkWin(turn));
-	}
-
-    document.getElementById("moves").onclick = function(){
-	    var pName = document.getElementById("id_chess_piece").value;
-        boardPoints = [];
-		whitePoints = [];
-		blackPoints = [];
-		guidePoints = [];
-		framePoints = [];
-		
-		boardColors = [];
-		whiteColors = [];
-		blackColors = [];
-		guideColors = [];
-		frameColors = [];
-
-		texBoardCoordsArray = [];
-		texWhiteCoordsArray = [];
-		texBlackCoordsArray = [];
-		texGuideCoordsArray = [];
-		texFrameCoordsArray = [];
-		
-		
-	
-        position = m_curquat;
-        theta = theta;
-	    gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
-		init();
-		
-		
-        showGuide(pName);
-		drawGuide(guideTexture, vec4(0.0, 1.0, 0.0, 1.0));
-		console.log(guidePoints);
-		console.log(guideColors);
-		console.log("guide ", texGuideCoordsArray);
-		console.log("CHECKING");
-
-
-	}
-}
 
 function showGuide(pieceName){
     var spaceVertices = []
@@ -757,56 +772,83 @@ function checkWin(turn){
     var checkSpots = [];
     var checkNow = [];
     var kingMoves = [];
+    console.log("turn: ", turn);
 
     if (turn == "white"){
         kingLoc = whitePieces[0]["location"];
+        console.log("king Location: ", kingLoc);
         kingMoves = playBook(whitePieces[0]);
 
         for (var i = 0; i<blackPieces.length; i++){
             if (blackPieces[i]["inPlay"] == true) {
+                //check if piece has already taken king
+                if (blackPieces[i]["location"][0] == kingLoc[0] && blackPieces[i]["location"][1] == kingLoc[1]){
+                    return "Black Wins!"
+                }
+
                 // get moves of all black pieces in play
                 possibleMoves = playBook(blackPieces[i]);
 
                 // check plays against king position
                 for (var j = 0; j < possibleMoves.length; j++){
-                    if (possibleMoves[j] == kingLoc){
+                    console.log(possibleMoves[j], " == ", kingLoc, possibleMoves[j] == kingLoc);
+                    console.log("possible moves: ", possibleMoves[j]);
+                    if (possibleMoves[j][0] == kingLoc[0] && possibleMoves[j][1] == kingLoc[1]){
                         checkNow.push(possibleMoves[i]);
                     }
                     for (var k = 0; k < kingMoves.length; k++){
-                        if (possibleMoves[j] == kingMoves[k]){
+                        console.log(possibleMoves[j], " == ", kingMoves[k], possibleMoves[j] == kingMoves[k]);
+                        if (possibleMoves[j][0] == kingMoves[k][0] && possibleMoves[j][1] == kingMoves[k][1] && kingMoves.length > 0){
                             checkSpots.push(possibleMoves[j]);
                         }
                     }
                 }
-                checkSpots.push(checkNow);
             }
+        }
+        if (checkNow.length > 0){
+            checkSpots.concat(checkNow);
         }
     }
 
     else if (turn == "black"){
         kingLoc = blackPieces[0]["location"];
+        console.log("king Location: ", kingLoc);
         kingMoves = playBook(blackPieces[0]);
 
         for (var i = 0; i<whitePieces.length; i++){
             if (whitePieces[i]["inPlay"] == true) {
+                //check if piece has already taken king
+                if (whitePieces[i]["location"][0] == kingLoc[0] && whitePieces[i]["location"][1] == kingLoc[1]){
+                    return "White Wins!"
+                }
+
                 // get moves of all black pieces in play
                 possibleMoves = playBook(whitePieces[i]);
 
                 // check plays against king position
                 for (var j = 0; j < possibleMoves.length; j++){
-                    if (possibleMoves[j] == kingLoc){
-                        checkNowSpots.push(possibleMoves[i]);
+                    console.log(possibleMoves[j], " == ", kingLoc, possibleMoves[j] == kingLoc);
+                    console.log("possible moves: ", possibleMoves[j]);
+                    if (possibleMoves[j][0] == kingLoc[0] && possibleMoves[j][1] == kingLoc[1]){
+                        checkNow.push(possibleMoves[i]);
                     }
                     for (var k = 0; k < kingMoves.length; k++){
-                        if (possibleMoves[j] == kingMoves[k]){
+                        console.log(possibleMoves[j], " == ", kingMoves[k], possibleMoves[j] == kingMoves[k]);
+                        if (possibleMoves[j][0] == kingMoves[k][0] && possibleMoves[j][1] == kingMoves[k][1] && kingMoves.length > 0){
                             checkSpots.push(possibleMoves[j]);
                         }
                     }
                 }
-                checkSpots.push(checkNow);
             }
         }
+        if (checkNow.length > 0){
+            checkSpots.concat(checkNow);
+        }
+        
     }
+
+    console.log("checkNow: ", checkNow);
+    console.log("checkSpots: ", checkSpots);
 
     if (kingMoves == checkSpots) {
         return "Check Mate";
@@ -944,7 +986,66 @@ function playBook(piece) {
  				}
  			 	k--;
  			}
- 			//}    
+ 			
+             j = col+1;
+             k = row+1;
+              // TOP RIGHT
+              while (j<8 && k<8 ){
+                 //console.log("top right\n");
+                  if(checkIfPiece(j, k, pieceColor) != 2){
+                     possibleMoves.push([k, j]); // switch bc Row, Col = y,x 
+                   }
+                  else{ // no more paths to highlight
+                      break;
+                  }
+                   j++;
+                 k++;
+              }
+
+             j = col - 1;
+             k = row + 1;
+              // TOP LEFT
+              while (j>=0 && k < 8){
+                 //console.log("top left\n");
+                  if(checkIfPiece(j, k, pieceColor) != 2){
+                     possibleMoves.push([k, j]);
+                   }
+                  else{ // no more paths to highlight
+                      break;
+                  }
+                  j--;
+                  k++;
+              }
+             
+              // BOTTOM LEFT
+             j = col - 1;
+             k = row - 1;
+              while (j>=0 && k>0){
+                 //console.log("bottom left\n");
+                  if(checkIfPiece(j, k, pieceColor) != 2){
+                     possibleMoves.push([k, j]);
+                   }
+                  else{ // no more paths to highlight
+                      break;
+                  }
+                  j--;
+                  k--;
+              }
+
+              j = col + 1;
+              k = row - 1;
+              // BOTTOM RIGHT
+              while (j<8 && k>=0){
+                 //console.log("bottom right\n");
+                  if(checkIfPiece(j, k, pieceColor) != 2){
+                     possibleMoves.push([k, j]);
+                   }
+                  else{ // no more paths to highlight
+                      break;
+                  }
+                  j++;
+                  k--;
+              }
      }
 
     //bishop
@@ -953,7 +1054,7 @@ function playBook(piece) {
             k = row+1;
  			// TOP RIGHT
  			while (j<8 && k<8 ){
-                console.log("top right\n");
+                //console.log("top right\n");
  				if(checkIfPiece(j, k, pieceColor) != 2){
 					possibleMoves.push([k, j]); // switch bc Row, Col = y,x 
  			 	}
@@ -967,7 +1068,7 @@ function playBook(piece) {
             k = row + 1;
  			// TOP LEFT
  			while (j>=0 && k < 8){
-                console.log("top left\n");
+                //console.log("top left\n");
  				if(checkIfPiece(j, k, pieceColor) != 2){
 					possibleMoves.push([k, j]);
  			 	}
@@ -982,7 +1083,7 @@ function playBook(piece) {
             j = col - 1;
             k = row - 1;
  			while (j>=0 && k>0){
-                console.log("bottom left\n");
+                //console.log("bottom left\n");
  				if(checkIfPiece(j, k, pieceColor) != 2){
 					possibleMoves.push([k, j]);
  			 	}
@@ -996,7 +1097,7 @@ function playBook(piece) {
              k = row - 1;
  			// BOTTOM RIGHT
  			while (j<8 && k>=0){
-                console.log("bottom right\n");
+                //console.log("bottom right\n");
  				if(checkIfPiece(j, k, pieceColor) != 2){
 					possibleMoves.push([k, j]);
  			 	}
@@ -1086,7 +1187,7 @@ function playBook(piece) {
 			
 			// RIGHT
 			while (j<8){
-                console.log("right\n");
+                //console.log("right\n");
 				if(checkIfPiece(j, row, pieceColor) != 2){
 					possibleMoves.push([row, j]);
 			 	}
@@ -1099,7 +1200,7 @@ function playBook(piece) {
 			j = col-1;
 			// LEFT
 			while (j>=0){
-                console.log("left\n");
+                //console.log("left\n");
 				if(checkIfPiece(j, row, pieceColor) != 2){
 					possibleMoves.push([row, j]);
 			 	}
@@ -1113,7 +1214,7 @@ function playBook(piece) {
 			k = row+1;
 			// UP
 			while (k<8){
-                console.log("up\n");
+                //console.log("up\n");
 				if(checkIfPiece(col, k, pieceColor) != 2){
 					possibleMoves.push([k, col]);
             	}
@@ -1126,7 +1227,7 @@ function playBook(piece) {
 			k = row-1;
 			// DOWN
 			while (k>=0){
-                console.log("down\n");
+                //console.log("down\n");
 				if(checkIfPiece(col, k, pieceColor) != 2){
 					possibleMoves.push([k, col]);
 			 	}
@@ -1942,7 +2043,7 @@ function createAll(){
 }
 
 function drawPieces() {
-	console.log("DRAWING");
+	//console.log("DRAWING");
 	//drawGuide(boardTexture, vec4(0.0, 1.0, 0.0, 1.0));
 	drawWhite(whiteTexture, vec4(1.0, 1.0, 1.0, 1.0));
 	drawBlack(blackTexture, vec4(0.99, 0.99, 0.98, 1.0));
@@ -1954,7 +2055,6 @@ function drawAll(){
     m_inc = build_rotmatrix(m_curquat);
     //rotate board on click
     if (rotate) {
-        console.log("rotated");
         theta += 3.14; //180 degrees == 3.14 radians
         gl.uniform1f(u_thetaLoc, theta);
         rotate = false;

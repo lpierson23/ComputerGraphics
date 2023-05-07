@@ -62,14 +62,17 @@ main()
 
 <body>
 <h1 id="whosTurn"></h1>
+<div>
 <canvas id="gl-canvas"  width="710" height="710">
+
+<p id="gameStatus" color="white"></p>
 	
 Oops ... your browser doesn't support the HTML5 canvas element
 </canvas>
 <img id = "texImage" src = "Chess_Board.png" hidden></img>
 <img id = "texImage2" src = "whiteMarble.png" hidden></img>
 <img id = "texImage3" src = "blackMarble.png" hidden></img>
-
+</div>
 
 <div>
 <button id="rotate">Rotate</button>
@@ -138,9 +141,10 @@ Chess Piece-------Row-------Col</br>
 <button id = "moves">Check Moves</button>
 
 <br/>
-Change Background Color
+<br/>
+Change Background Color  
 <select name="backgroundColor" id="backgroundColor">
-  <option value="green">green</option>
+  <option value="green" selected>green</option>
   <option value="red">red</option>
   <option value="blue">blue</option>
   <option value="purple">purple</option>
