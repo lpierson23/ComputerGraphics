@@ -211,9 +211,14 @@ function drawTurn() {
 
 function pieceTaken(currentLocation, color){
     if(color == "white"){
-        if (checkIfPiece(currentLocation[1], currentLocation[0], color) == 1){
-            for (var i = 0; i++; i < blackPieces.length){
-                if (blackPieces[i]["location"] == currentLocation){
+        //console.log(currentLocation);
+        //console.log("check Piece " , checkIfPiece(currentLocation[1], currentLocation[0], vec4(1.0, 1.0, 1.0, 1.0)))
+        if (checkIfPiece(currentLocation[1], currentLocation[0], vec4(1.0, 1.0, 1.0, 1.0)) == 1){
+            //console.log("inside if statement");
+            for (var i = 0; i < 16; i++){
+                //console.log(blackPieces[i]["location"][0], currentLocation[0], blackPieces[i]["location"][1], currentLocation[1]);
+                if (blackPieces[i]["location"][0] == currentLocation[0] && blackPieces[i]["location"][1] == currentLocation[1]){
+                    //console.log("set to false");
                     blackPieces[i]["inPlay"] = false;
                 }
             }
@@ -221,9 +226,14 @@ function pieceTaken(currentLocation, color){
     }
 
     else if(color == "black"){
-        if (checkIfPiece(currentLocation[1], currentLocation[0], color) == 1){
-            for (var i = 0; i++; i < whitePieces.length){
-                if (whitePieces[i]["location"] == currentLocation){
+        //console.log(currentLocation);
+        //console.log("check Piece " , checkIfPiece(currentLocation[1], currentLocation[0], vec4(0.0, 0.0, 0.0, 1.0)))
+        if (checkIfPiece(currentLocation[1], currentLocation[0], vec4(0.0, 0.0, 0.0, 1.0)) == 1){
+            //console.log("inside if statement");
+            for (var i = 0; i < 16; i++){
+                //console.log(whitePieces[i]["location"][0], currentLocation[0], whitePieces[i]["location"][1], currentLocation[1]);
+                if (whitePieces[i]["location"][0] == currentLocation[0] && whitePieces[i]["location"][1] == currentLocation[1]){
+                    //console.log("set to false");
                     whitePieces[i]["inPlay"] = false;
                 }
             }
@@ -269,7 +279,10 @@ function movePiece(){
 							}
 						}
 						whitePieces[i]["location"] = [pRow, pCol];
+                        console.log("colors and points ", colors.length, points.length);
                         pieceTaken(whitePieces[i]["location"], "white");
+                        console.log("colors and points ", colors.length, points.length);
+                        console.log(whitePieces, blackPieces);
 						turn = "black";
                         previousTurn = "white";
                         rotate = true;
@@ -307,7 +320,10 @@ function movePiece(){
 						}
 
 						blackPieces[i]["location"] = [pRow, pCol];
+                        console.log("colors and points ", colors.length, points.length);
                         pieceTaken(blackPieces[i]["location"], "black");
+                        console.log("colors and points ", colors.length, points.length);
+                        console.log(whitePieces, blackPieces);
 						turn = "white";
                         previousTurn = "black;"
                         rotate = true;
@@ -568,6 +584,8 @@ function checkIfPiece(col, row, color) {
 		}
 	}
 
+    var result = 0;
+
     for (var i = 0; i < 16; i++){
 		if (colorWhite == true){ // you are white
        		if (blackPieces[i]["location"][0] == row && blackPieces[i]["location"][1] == col && blackPieces[i]["inPlay"]){
@@ -576,7 +594,7 @@ function checkIfPiece(col, row, color) {
         	}
         	else if (whitePieces[i]["location"][0] == row && whitePieces[i]["location"][1] == col && whitePieces[i]["inPlay"]){
            	 	// there is a piece in that location, but it is the same color as your team (white piece in that spot and you are white)
-            	return 2;
+            	result = 2;
         	}
 
 		}
@@ -587,12 +605,12 @@ function checkIfPiece(col, row, color) {
        	 	} 
        	 	else if (blackPieces[i]["location"][0] == row && blackPieces[i]["location"][1] == col && blackPieces[i]["inPlay"]){
            	 	// there is a piece in that location, but it is the same color as your team (black piece in that spot and you are black)
-           	 	return 2;
+           	 	result = 2;
       	  	}
 
 		}
     }
-	return 0;
+	return result;
 	
 }
 
@@ -607,17 +625,17 @@ function checkWin(turn){
         kingLoc = whitePieces[0]["location"];
         kingMoves = playBook(whitePieces[0]);
 
-        for (var i = 0; i++; i<blackPieces.length){
+        for (var i = 0; i<blackPieces.length; i++){
             if (blackPieces[i]["inPlay"] == true) {
                 // get moves of all black pieces in play
                 possibleMoves = playBook(blackPieces[i]);
 
                 // check plays against king position
-                for (var j = 0; j++; j < possibleMoves.length){
+                for (var j = 0; j < possibleMoves.length; j++){
                     if (possibleMoves[j] == kingLoc){
                         checkNow.push(possibleMoves[i]);
                     }
-                    for (var k = 0; k++; k < kingMoves.length){
+                    for (var k = 0; k < kingMoves.length; k++){
                         if (possibleMoves[j] == kingMoves[k]){
                             checkSpots.push(possibleMoves[j]);
                         }
@@ -632,17 +650,17 @@ function checkWin(turn){
         kingLoc = blackPieces[0]["location"];
         kingMoves = playBook(blackPieces[0]);
 
-        for (var i = 0; i++; i<whitePieces.length){
+        for (var i = 0; i<whitePieces.length; i++){
             if (whitePieces[i]["inPlay"] == true) {
                 // get moves of all black pieces in play
                 possibleMoves = playBook(whitePieces[i]);
 
                 // check plays against king position
-                for (var j = 0; j++; j < possibleMoves.length){
+                for (var j = 0; j < possibleMoves.length; j++){
                     if (possibleMoves[j] == kingLoc){
                         checkNowSpots.push(possibleMoves[i]);
                     }
-                    for (var k = 0; k++; k < kingMoves.length){
+                    for (var k = 0; k < kingMoves.length; k++){
                         if (possibleMoves[j] == kingMoves[k]){
                             checkSpots.push(possibleMoves[j]);
                         }
@@ -987,27 +1005,27 @@ function playBook(piece) {
     if (piece["name"].startsWith("pawn") && piece["inPlay"]){
         if(colorWhite){
             //check if pawn has been moved already and if there is no piece two spaces ahead
-            if (row == 1 && checkIfPiece(col, row + 2, white) == 0){
+            if (row == 1 && checkIfPiece(col, row + 2, vec4(1.0, 1.0, 1.0, 1.0)) == 0){
                 // highlight move two forward for white piece
 				possibleMoves.push([row+2, col]);
             }
 
             // if there is a piece diagonally to left and it is the opposite color
-            if (checkIfPiece(col - 1, row + 1, white) == 1){
+            if (checkIfPiece(col - 1, row + 1, vec4(1.0, 1.0, 1.0, 1.0)) == 1){
                 if(col - 1 >= 0 && col - 1 < 8 && row + 1 >= 0 && row + 1 < 8){
 				    possibleMoves.push([row+1, col-1]);
                 }
             }
 
             // if there is a piece diagonally to right and it is the opposite color
-            if (checkIfPiece(col + 1, row + 1, white) == 1){
+            if (checkIfPiece(col + 1, row + 1, vec4(1.0, 1.0, 1.0, 1.0)) == 1){
                 if(col + 1 >= 0 && col + 1 < 8 && row + 1 >= 0 && row + 1 < 8){
 				    possibleMoves.push([row+1, col+1]);
                 }
             }
 
             // if there are no piece one space ahead, move there
-            if (checkIfPiece(col, row + 1, white) == 0){
+            if (checkIfPiece(col, row + 1, vec4(1.0, 1.0, 1.0, 1.0)) == 0){
                 if(col >= 0 && col < 8 && row + 1 >= 0 && row + 1 < 8){
 				    possibleMoves.push([row+1, col]);
                 }
@@ -1016,34 +1034,34 @@ function playBook(piece) {
 
         else{
             //check if pawn has been moved already and if there is no piece two spaces ahead
-            if (row == 6 && checkIfPiece(col, row - 2, black) == 0){
+            if (row == 6 && checkIfPiece(col, row - 2, vec4(0.0, 0.0, 0.0, 1.0)) != 2){
                 // highlight move two forward for black piece
 				possibleMoves.push([row-2, col]);
             }
 
             // if there is a piece diagonally to left and it is the opposite color
-            if (checkIfPiece(col - 1, row - 1, black) == 1){
+            if (checkIfPiece(col - 1, row - 1, vec4(0.0, 0.0, 0.0, 1.0)) == 1){
                 if (col - 1 >= 0 && col - 1 < 8 && row - 1 >= 0 && row - 1 < 8){
 				    possibleMoves.push([row-1, col-1]);
                 }
             }
 
             // if there is a piece diagonally to right and it is the opposite color
-            if (checkIfPiece(col + 1, row - 1, black) == 1){
+            if (checkIfPiece(col + 1, row - 1, vec4(0.0, 0.0, 0.0, 1.0)) == 1){
                 if(col + 1 >= 0 && col + 1 < 8 && row - 1 >= 0 && row - 1 < 8){
 				    possibleMoves.push([row-1, col+1]);
                 }
             }
 
             // if there are no piece one space ahead, move there
-            if (checkIfPiece(col, row - 1, black) == 0){
+            if (checkIfPiece(col, row - 1, vec4(0.0, 0.0, 0.0, 1.0)) == 0){
                 if(col >= 0 && col < 8 && row - 1 >= 0 && row - 1 < 8){
 				    possibleMoves.push([row-1, col]);
                 }
             }
         }      
     }
-    console.log(possibleMoves);
+    //console.log(possibleMoves);
 	return possibleMoves;
 }
 
@@ -1088,7 +1106,7 @@ function quad(a, b, c, d, vertices, color)
 		}
     }
 
-    console.log(texCoordsArray);
+    //console.log(texCoordsArray);
 }
 
 function calculateKingVertices(col, row) {
