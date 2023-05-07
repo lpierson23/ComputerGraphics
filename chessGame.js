@@ -375,6 +375,7 @@ window.onload = function init()
 
     // for trackball
     m_curquat = position;
+    NumVertices = 0;
     console.log("m_curquat", m_curquat);
     createBoard();
     drawPieces();
@@ -1086,6 +1087,8 @@ function quad(a, b, c, d, vertices, color)
 			texCoordsArray.push(texCoord[2]);
 		}
     }
+
+    console.log(texCoordsArray);
 }
 
 function calculateKingVertices(col, row) {
