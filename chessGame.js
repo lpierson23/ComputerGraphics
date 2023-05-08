@@ -3,6 +3,7 @@
 var canvas;
 var gl;
 
+var CHECK_NAME ="";
 var turn = "white"; // start with white's turn
 var previousTurn = "black";
 
@@ -362,7 +363,7 @@ window.onload = function init()
         guideTexture.image.onload = function() {
         configureTexture( guideTexture);
         }
-        guideTexture.image.src = "Chess_Board.png";
+        guideTexture.image.src = "yellow_square.jpg";
     
     frameTexture = gl.createTexture();
     frameTexture.image = new Image();
@@ -484,21 +485,13 @@ window.onload = function init()
         texBlackCoordsArray = [];
         texGuideCoordsArray = [];
         texFrameCoordsArray = [];
-        
-        
-    
+                
+    	CHECK_NAME = pName;
+		showGuide(pName);
         position = m_curquat;
         theta = theta;
         gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
         init();
-        
-        
-        showGuide(pName);
-        drawGuide(guideTexture, vec4(0.0, 1.0, 0.0, 1.0));
-        console.log(guidePoints);
-        console.log(guideColors);
-        console.log("guide ", texGuideCoordsArray);
-        console.log("CHECKING");
     }
 }
 
@@ -579,6 +572,7 @@ function movePiece(){
                         //console.log(whitePieces, blackPieces);
 						turn = "black";
                         previousTurn = "white";
+						CHECK_NAME = "";
                         rotate = true;
 						return true;
 					}
@@ -929,8 +923,7 @@ function playBook(piece) {
     //queen
     if (piece["name"] === "queen" && piece["inPlay"]){
 		// same as bishop and rook combined!
-		
-        // if (pieceColor == white){
+		// ROOK FUNCTIONALITY
              // suggest if there is no piece in the spot or a piece of the other color on right
  			j = col+1;
  			k = row;
@@ -943,6 +936,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(j, row, pieceColor) == 1){
+					break;
+			 	}
  			 	j++;
  			}
 			
@@ -955,6 +951,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(j, row, pieceColor) == 1){
+					break;
+			 	}
  			 	j--;
  			}
 			
@@ -968,6 +967,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(col, k, pieceColor) == 1){
+					break;
+			 	}
  			 	k++;
  			}
 			
@@ -980,9 +982,13 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(col, k, pieceColor) == 1){
+					break;
+			 	}
  			 	k--;
  			}
  			
+			/// BISHOP FUNCTIONALITY
              j = col+1;
              k = row+1;
               // TOP RIGHT
@@ -994,6 +1000,9 @@ function playBook(piece) {
                   else{ // no more paths to highlight
                       break;
                   }
+  				if(checkIfPiece(j, k, pieceColor) == 1){
+  					break;
+  			 	}
                    j++;
                  k++;
               }
@@ -1009,6 +1018,9 @@ function playBook(piece) {
                   else{ // no more paths to highlight
                       break;
                   }
+  				if(checkIfPiece(j, k, pieceColor) == 1){
+  					break;
+  			 	}
                   j--;
                   k++;
               }
@@ -1024,6 +1036,9 @@ function playBook(piece) {
                   else{ // no more paths to highlight
                       break;
                   }
+  				if(checkIfPiece(j, k, pieceColor) == 1){
+  					break;
+  			 	}
                   j--;
                   k--;
               }
@@ -1036,6 +1051,9 @@ function playBook(piece) {
                   if(checkIfPiece(j, k, pieceColor) != 2){
                      possibleMoves.push([k, j]);
                    }
+   				if(checkIfPiece(j, k, pieceColor) == 1){
+   					break;
+   			 	}
                   else{ // no more paths to highlight
                       break;
                   }
@@ -1057,6 +1075,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(j, k, pieceColor) == 1){
+					break;
+			 	}
  			 	j++;
                 k++;
  			}
@@ -1071,6 +1092,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(j, k, pieceColor) == 1){
+					break;
+			 	}
                  j--;
                  k++;
  			}
@@ -1086,6 +1110,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(j, k, pieceColor) == 1){
+					break;
+			 	}
                  j--;
                  k--;
  			}
@@ -1100,6 +1127,9 @@ function playBook(piece) {
  				else{ // no more paths to highlight
  					break;
  				}
+				if(checkIfPiece(j, k, pieceColor) == 1){
+					break;
+			 	}
                  j++;
                  k--;
  			}
@@ -1190,6 +1220,9 @@ function playBook(piece) {
 				else{ // no more paths to highlight
 					break;
 				}
+				if(checkIfPiece(j, row, pieceColor) == 1){
+					break;
+			 	}
 			 	j++;
 			}
 			
@@ -1203,6 +1236,9 @@ function playBook(piece) {
 				else{ // no more paths to highlight
 					break;
 				}
+				if(checkIfPiece(j, row, pieceColor) == 1){
+					break;
+			 	}
 			 	j--;
 			}
 			
@@ -1217,6 +1253,9 @@ function playBook(piece) {
 				else{ // no more paths to highlight
 					break;
 				}
+				if(checkIfPiece(col, k, pieceColor) == 1){
+					break;
+			 	}
 			 	k++;
 			}
 			
@@ -1230,6 +1269,9 @@ function playBook(piece) {
 				else{ // no more paths to highlight
 					break;
 				}
+				if(checkIfPiece(col, k, pieceColor) == 1){
+					break;
+			 	}
 			 	k--;
 			}
 			//}    
@@ -2105,11 +2147,12 @@ function createAll(){
     drawKnight();
     drawRook();
     drawPawn();
+	showGuide(CHECK_NAME);
 }
 
 function drawPieces() {
 	//console.log("DRAWING");
-	//drawGuide(boardTexture, vec4(0.0, 1.0, 0.0, 1.0));
+	drawGuide(guideTexture, vec4(1.0, 1.0, 1.0, 1.0));
 	drawWhite(whiteTexture, vec4(1.0, 1.0, 1.0, 1.0));
 	drawBlack(blackTexture, vec4(0.99, 0.99, 0.98, 1.0));
 }
