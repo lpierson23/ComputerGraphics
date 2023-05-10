@@ -7,7 +7,6 @@ var CHECK_NAME ="";
 var turn = "white"; // start with white's turn
 var previousTurn = "black";
 
-var u_rotateBoard;
 var u_projMatrixLoc;
 
 var NumVertices  = 36;
@@ -452,7 +451,6 @@ window.onload = function init()
         "u_shininess"),materialShininess );
 
     u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
-    u_rotateBoard = gl.getUniformLocation(program, "u_rotateBoard");
     u_projMatrixLoc = gl.getUniformLocation( program, "u_projMatrix" ); 
 
     var projMatrix = ortho(-1.15, 1.15, -1.15, 1.15, -1.15, 1.15);
@@ -2416,15 +2414,10 @@ function drawAll(){
     //rotate board on click
     if (rotate) {
         gl.uniform1f(u_thetaLoc, theta);
-        rotate = false;
-        gl.uniform1i(u_rotateBoard, true);
+        rotate = false;    
         
     }
-    // orthogonal projection matrix * trackball rotation matrix
-    else {
-        gl.uniform1i(u_rotateBoard, false);
-    }
-
+   
 
 	gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix));
 	drawBoard(boardTexture, vec4(1.0, 1.0, 1.0, 1.0));
