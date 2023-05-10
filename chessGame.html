@@ -16,7 +16,7 @@
   uniform mat4 u_projMatrix;
   
   uniform float u_theta;
-  attribute  vec2 a_vTextureCoord;
+  attribute vec2 a_vTextureCoord;
   varying vec2 v_fTextureCoord;
   
   uniform bool u_rotateBoard;
@@ -25,64 +25,61 @@
 void main()
 {
 
-  if(u_rotateBoard){
-    float s = sin(u_theta);
-    float c = cos(u_theta);
-    vec4 pos;
-    pos.x = c * a_vPosition.x - s * a_vPosition.y;
-    pos.y = s * a_vPosition.x + c * a_vPosition.y;
-    pos.z = a_vPosition.z;
-    pos.w = a_vPosition.w;
+  vec3 pos;
 
-    gl_Position = u_projMatrix * u_ctMatrix * pos;
-    v_fColor = a_vColor;
-    v_fTextureCoord = a_vTextureCoord;
-  }
-  else{
-    vec3 pos = (u_ctMatrix * a_vPosition).xyz;
+  float s = sin(u_theta);
+  float c = cos(u_theta);
+  //vec4 pos;
+  pos.x = c * a_vPosition.x - s * a_vPosition.y;
+  pos.y = s * a_vPosition.x + c * a_vPosition.y;
+  pos.z = a_vPosition.z;
 
       
-    vec3 light;
+  vec3 light;
 
-    light = (u_ctMatrix * u_lightPosition).xyz;
-    vec3 L;
-    L = normalize(light - pos);
-    vec3 V;
-    V = normalize(-pos);
-    vec3 N;
-    vec4 tempN = a_vNormal;
-    if(tempN.x<0.0||tempN.y<0.0||tempN.z<0.0){
-      tempN = -tempN;
-    }
-    N = normalize((u_ctMatrix * tempN).xyz);
-    vec3 R;
-    R = normalize(-reflect(L, N));
-
-    vec3 E = -normalize(pos);
-    vec3 H = normalize(L + E);
-
-    vec4 ambient = u_ambientProduct;
-    float Kd = max( dot(L, N), 0.0 );
-
-    vec4  diffuse = Kd*u_diffuseProduct;
-    float Ks = pow( max(dot(E, R), 0.0), u_shininess );
-    vec4  specular = Ks * u_specularProduct;
-
-    if( dot(L, N) < 0.0 ) {
-        specular = vec4(0.0, 0.0, 0.0, 1.0);
-    }
-
-    gl_Position =  u_projMatrix * u_ctMatrix * a_vPosition;
-
-    v_fColor = ambient + diffuse + specular;
-    //v_fColor.rgb = tempN.xyz;
-    //v_fColor.rgb = N.xyz;
-
-    v_fColor.a = 1.0;
-
-    
-    v_fTextureCoord = a_vTextureCoord;  
+  light = (u_ctMatrix * u_lightPosition).xyz;
+  vec3 L;
+  L = normalize(light - pos);
+  vec3 V;
+  V = normalize(-pos);
+  vec3 N;
+  vec4 tempN = a_vNormal;
+  if(tempN.x<0.0||tempN.y<0.0||tempN.z<0.0){
+    tempN = -tempN;
   }
+  N = normalize((u_ctMatrix * tempN).xyz);
+  vec3 R;
+  R = normalize(-reflect(L, N));
+
+  vec3 E = -normalize(pos);
+  vec3 H = normalize(L + E);
+
+  vec4 ambient = u_ambientProduct;
+  float Kd = max( dot(L, N), 0.0 );
+
+  vec4  diffuse = Kd*u_diffuseProduct;
+  float Ks = pow( max(dot(E, R), 0.0), u_shininess );
+  vec4  specular = Ks * u_specularProduct;
+
+  if( dot(L, N) < 0.0 ) {
+      specular = vec4(0.0, 0.0, 0.0, 1.0);
+  }
+
+  vec4 position;
+  position.x = pos.x;
+  position.y = pos.y;
+  position.z = pos.z;
+  position.w = a_vPosition.w;
+
+
+  gl_Position =  u_projMatrix * u_ctMatrix * position;
+
+  v_fColor = ambient + diffuse + specular;
+  v_fColor = v_fColor * a_vColor;
+  v_fColor.a = 1.0;
+
+  v_fTextureCoord = a_vTextureCoord;  
+
 }
 </script>
 
@@ -209,7 +206,7 @@ Change Background Color
 
 </br>
 </br>
-<span style="margin-right: 170px;">Player 1 Piece Location</span><span>Player 2 Piece Location</span>
+<span style="margin-right: 170px;">White Piece Locations</span><span>Black Piece Locations</span>
 <div style="display: flex;">
   <textarea id="currWLoc" style="height: 200px; width: 300px;"></textarea>
   <textarea id="currBLoc" style="height: 200px; width: 300px;"></textarea>
@@ -217,7 +214,7 @@ Change Background Color
 
 </br>
 </br>
-<span style="margin-right: 270px;">Player 1</span><span>Player 2</span>
+<span style="margin-right: 270px;">White</span><span>Black</span>
 
 
 <div style="display: flex;">
