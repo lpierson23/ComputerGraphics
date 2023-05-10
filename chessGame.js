@@ -7,6 +7,9 @@ var CHECK_NAME ="";
 var turn = "white"; // start with white's turn
 var previousTurn = "black";
 
+var u_rotateBoard;
+var u_projMatrixLoc;
+
 var NumVertices  = 36;
 
 var rotate = false;
@@ -41,6 +44,11 @@ var texWhiteCoordsArray = [];
 var texBlackCoordsArray = [];
 var texGuideCoordsArray = [];
 
+var nBoardCoordsArray = [];
+var	nWhiteCoordsArray = [];
+var	nBlackCoordsArray = [];
+var	nGuideCoordsArray = [];
+var	nFrameCoordsArray = [];
 
 var boardTexture;
 var whiteTexture;
@@ -66,6 +74,34 @@ var cBoardBuffer, cWhiteBuffer, cBlackBuffer, cGuideBuffer, cFrameBuffer;
 var a_vTextureCoordLoc;
 var u_textureSamplerLoc
 
+//-----global array to store sphere vertex normals
+var nBoardBuffer, nWhiteBuffer, nBlackBuffer, nGuideBuffer, nFrameBuffer;
+
+var a_vNormalLoc;
+//--------point light (assume in object space)
+var r_val = 1.0; 
+var g_val = 1.0; 
+var b_val = 1.0;
+var lightPosition = vec4(1.0, 1.0, 1.0, 0.0 );
+
+//lightPosition = vec4(r_val, g_val, b_val, 0.0 );
+
+var lightAmbient = vec4(0.1, 0.1, 0.0, 0.0 );
+var lightDiffuse;
+// = vec4( r_val, g_val, b_val, 1.0 );
+var lightSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+
+var materialAmbient = vec4( 1.0, 0.0, 1.0, 1.0 );
+var materialDiffuse = vec4( 1.0, 1.0, 1.0, 1.0 );
+var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var materialShininess = 50.0;
+
+
+var eye;
+var at = vec3(0.0, 0.0, 0.0);
+var up = vec3(0.0, 1.0, 0.0);
+//---everything up to here added
+
 // for trackball
 var m_inc;
 var m_curquat;
@@ -73,6 +109,83 @@ var m_mousex = 1;
 var m_mousey = 1;
 var trackballMove = false;
 var position = trackball(0.0, 0.0, 0.0, 0.0);
+
+//log
+var wCount = 0;
+var bCount = 0;
+var wLog = {};
+var bLog = {};
+
+//current location
+var currWhitePieces = [
+    {name: "king",
+    location: [1, 4]},
+    {name: "queen",
+    location: [1, 4]},
+    {name: "bishop1",
+    location: [1, 3]},
+    {name: "bishop2",
+    location: [1, 6]},
+    {name: "knight1",
+    location: [1, 2]},
+    {name: "knight2",
+    location: [1, 7]},
+    {name: "rook1",
+    location: [1, 1]},
+    {name: "rook2",
+    location: [1, 8]},
+    {name: "pawn1",
+    location: [2, 1]},
+    {name: "pawn2",
+    location: [2, 2]},
+    {name: "pawn3",
+    location: [2, 3]},
+    {name: "pawn4",
+    location: [2, 4]},
+    {name: "pawn5",
+    location: [2, 5]},
+    {name: "pawn6",
+    location: [2, 6]},
+    {name: "pawn7",
+    location: [2, 7]},
+    {name: "pawn8",
+    location: [2, 8]},
+];
+
+var currBlackPieces = [
+    {name: "king",
+    location: [8, 5]},
+    {name: "queen",
+    location: [8, 4]},
+    {name: "bishop1",
+    location: [8, 6]},
+    {name: "bishop2",
+    location: [8, 3]},
+    {name: "knight1",
+    location: [8, 7]},
+    {name: "knight2",
+    location: [8, 2]},
+    {name: "rook1",
+    location: [8, 8]},
+    {name: "rook2",
+    location: [8, 1]},
+    {name: "pawn1",
+    location: [7, 8]},
+    {name: "pawn2",
+    location: [7, 7]},
+    {name: "pawn3",
+    location: [7, 6]},
+    {name: "pawn4",
+    location: [7, 5]},
+    {name: "pawn5",
+    location: [7, 4]},
+    {name: "pawn6",
+    location: [7, 3]},
+    {name: "pawn7",
+    location: [7, 2]},
+    {name: "pawn8",
+    location: [7, 1]},
+];
 
 // piece data (location is [row, column])
 var whitePieces = [
@@ -249,6 +362,39 @@ window.onload = function init()
     createBoard();
     createAll();
 
+    lightDiffuse = vec4( r_val, g_val, b_val, 1.0 );
+   
+    document.getElementById("sliderR").onchange = function(event) {
+        r_val = event.target.value;
+        lightDiffuse = vec4( r_val, g_val, b_val, 1.0 );
+        diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        gl.uniform4fv( gl.getUniformLocation(program,
+            "u_diffuseProduct"),flatten(diffuseProduct) );
+        render();
+        console.log(r_val);
+    };
+    document.getElementById("sliderG").onchange = function(event) {
+        g_val = event.target.value;
+        lightDiffuse = vec4( r_val, g_val, b_val, 1.0 );
+        diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        gl.uniform4fv( gl.getUniformLocation(program,
+            "u_diffuseProduct"),flatten(diffuseProduct) );
+        render();
+    };
+    document.getElementById("sliderB").onchange = function(event) {
+        b_val = event.target.value;
+        lightDiffuse = vec4( r_val, g_val, b_val, 1.0 );
+        diffuseProduct = mult(lightDiffuse, materialDiffuse);
+        gl.uniform4fv( gl.getUniformLocation(program,
+            "u_diffuseProduct"),flatten(diffuseProduct) );
+        render();
+    };
+
+    //---added
+    var ambientProduct = mult(lightAmbient, materialAmbient);
+    var diffuseProduct = mult(lightDiffuse, materialDiffuse);
+    var specularProduct = mult(lightSpecular, materialSpecular);
+
     // COLOR BUFFERS
     cBoardBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, cBoardBuffer );
@@ -296,11 +442,52 @@ window.onload = function init()
     vFrameBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vFrameBuffer );
     gl.bufferData( gl.ARRAY_BUFFER, flatten(framePoints), gl.STATIC_DRAW );
+
+
     
     
+    //-----added--------
+     gl.uniform4fv( gl.getUniformLocation(program,
+         "u_ambientProduct"),flatten(ambientProduct) );
+      gl.uniform4fv( gl.getUniformLocation(program,
+         "u_diffuseProduct"),flatten(diffuseProduct) );
+      gl.uniform4fv( gl.getUniformLocation(program,
+         "u_specularProduct"),flatten(specularProduct) );
+      gl.uniform4fv( gl.getUniformLocation(program,
+         "u_lightPosition"),flatten(lightPosition) );
+      gl.uniform1f( gl.getUniformLocation(program,
+         "u_shininess"),materialShininess );
+
     u_ctMatrixLoc = gl.getUniformLocation(program, "u_ctMatrix");
-    
-    
+    u_rotateBoard = gl.getUniformLocation(program, "u_rotateBoard"); //added
+    u_projMatrixLoc = gl.getUniformLocation( program, "u_projMatrix" ); //added
+    //added
+    var projMatrix = ortho(-1.15, 1.15, -1.15, 1.15, -1.15, 1.15);
+    gl.uniformMatrix4fv(u_projMatrixLoc, false, flatten(projMatrix) );
+
+     //----added-----
+     a_vNormalLoc = gl.getAttribLocation(program, "a_vNormal");
+
+     nBoardBuffer = gl.createBuffer();
+     gl.bindBuffer( gl.ARRAY_BUFFER, nBoardBuffer );
+     gl.bufferData( gl.ARRAY_BUFFER, flatten(nBoardCoordsArray), gl.STATIC_DRAW ); ///??
+     
+     nWhiteBuffer = gl.createBuffer();
+     gl.bindBuffer( gl.ARRAY_BUFFER, nWhiteBuffer );
+     gl.bufferData( gl.ARRAY_BUFFER, flatten(nWhiteCoordsArray), gl.STATIC_DRAW ); 
+     
+     nBlackBuffer = gl.createBuffer();
+     gl.bindBuffer( gl.ARRAY_BUFFER, nBlackBuffer );
+     gl.bufferData( gl.ARRAY_BUFFER, flatten(nBlackCoordsArray), gl.STATIC_DRAW ); 
+     
+     nGuideBuffer = gl.createBuffer();
+     gl.bindBuffer( gl.ARRAY_BUFFER, nGuideBuffer );
+     gl.bufferData( gl.ARRAY_BUFFER, flatten(nGuideCoordsArray), gl.STATIC_DRAW ); 
+     
+     nFrameBuffer = gl.createBuffer();
+     gl.bindBuffer( gl.ARRAY_BUFFER, nFrameBuffer );
+     gl.bufferData( gl.ARRAY_BUFFER, flatten(nFrameCoordsArray), gl.STATIC_DRAW ); 
+
     // send texture coordiantes data down to the GPU
     // to be implemented
     // TEXTURE BUFFERS
@@ -440,6 +627,12 @@ window.onload = function init()
         guideColors = [];
         frameColors = [];
 
+        nBoardCoordsArray = [];
+		nWhiteCoordsArray = [];
+		nBlackCoordsArray = [];
+		nGuideCoordsArray = [];
+		nFrameCoordsArray = [];
+
         texBoardCoordsArray = [];
         texWhiteCoordsArray = [];
         texBlackCoordsArray = [];
@@ -479,6 +672,12 @@ window.onload = function init()
         blackColors = [];
         guideColors = [];
         frameColors = [];
+
+        nBoardCoordsArray = [];
+		nWhiteCoordsArray = [];
+		nBlackCoordsArray = [];
+		nGuideCoordsArray = [];
+		nFrameCoordsArray = [];
 
         texBoardCoordsArray = [];
         texWhiteCoordsArray = [];
@@ -566,6 +765,11 @@ function movePiece(){
 							}
 						}
 						whitePieces[i]["location"] = [pRow, pCol];
+                        var myText = document.getElementById("currWLoc");
+                        currWhitePieces[i]["location"] = [pRow+1, pCol+1];
+                        var jsonSt = JSON.stringify(currWhitePieces, null);
+                        myText.value = jsonSt; 
+                        
                         //console.log("colors and points ", colors.length, points.length);
                         pieceTaken(whitePieces[i]["location"], "white");
                         //console.log("colors and points ", colors.length, points.length);
@@ -573,6 +777,21 @@ function movePiece(){
 						turn = "black";
                         previousTurn = "white";
 						CHECK_NAME = "";
+                        wCount++;
+                        wLog[wCount] = {name: pName, row: pRow+1, col: pCol+1};
+                        console.log("play tracker at count " , wLog[wCount]);  
+                        console.log("play tracker " , wLog);  
+
+                        var myTextarea = document.getElementById("wLog");
+                     
+                        //for( var i =0; i<=wCount; i++ ){
+                        //      console.log(i);
+                             var jsonStr = JSON.stringify(wLog, null);
+                             console.log("play tracker here " , wLog[wCount]); 
+                             
+                        //} 
+                        myTextarea.value = jsonStr; 
+                        
                         rotate = true;
 						return true;
 					}
@@ -608,12 +827,30 @@ function movePiece(){
 						}
 
 						blackPieces[i]["location"] = [pRow, pCol];
+                        var myText = document.getElementById("currBLoc");
+                        currBlackPieces[i]["location"] = [pRow+1, pCol+1];
+                        var jsonSt = JSON.stringify(currBlackPieces, null);
+                        myText.value = jsonSt; 
                         //console.log("colors and points ", colors.length, points.length);
                         pieceTaken(blackPieces[i]["location"], "black");
                         //console.log("colors and points ", colors.length, points.length);
                         //console.log(whitePieces, blackPieces);
 						turn = "white";
                         previousTurn = "black;"
+                        bCount++;
+                        bLog[bCount] = {name: pName, row: pRow+1, col: pCol+1};
+                        console.log("play tracker at count " , bLog[bCount]);  
+                        console.log("play tracker " , bLog);  
+
+                        var myTextarea = document.getElementById("bLog");
+                     
+                        // for( var i =0; i<=wCount; i++ ){
+                        //      console.log(i);
+                             var jsonStr = JSON.stringify(bLog, 1);
+                             console.log("play tracker here " , bLog[bCount]); 
+                             
+                        //} 
+                        myTextarea.value = jsonStr; 
                         rotate = true;
 						return true;
 					}
@@ -1361,6 +1598,11 @@ function drawGuide(texture, color){
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tGuideBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+
+    //----added-----
+    gl.enableVertexAttribArray( a_vNormalLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, nGuideBuffer);
+    gl.vertexAttribPointer(a_vNormalLoc, 4, gl.FLOAT, false, 0, 0);
 	
 	gl.enableVertexAttribArray( a_vPositionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, vGuideBuffer);
@@ -1380,6 +1622,11 @@ function drawBlack(texture, color){
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tBlackBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+
+    //----added-----
+    gl.enableVertexAttribArray( a_vNormalLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, nBlackBuffer);
+    gl.vertexAttribPointer(a_vNormalLoc, 4, gl.FLOAT, false, 0, 0);
 
 	gl.enableVertexAttribArray( a_vPositionLoc );
 	gl.bindBuffer(gl.ARRAY_BUFFER, vBlackBuffer);
@@ -1401,6 +1648,11 @@ function drawWhite(texture, color){
     gl.bindBuffer(gl.ARRAY_BUFFER, tWhiteBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
 
+     //----added-----
+     gl.enableVertexAttribArray( a_vNormalLoc );
+     gl.bindBuffer(gl.ARRAY_BUFFER, nWhiteBuffer);
+     gl.vertexAttribPointer(a_vNormalLoc, 4, gl.FLOAT, false, 0, 0);
+
     gl.enableVertexAttribArray( a_vPositionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, vWhiteBuffer);
     gl.vertexAttribPointer(a_vPositionLoc, 4, gl.FLOAT, false, 0, 0);
@@ -1419,6 +1671,11 @@ function drawBoard(texture, color){
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tBoardBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+
+     //----added-----
+     gl.enableVertexAttribArray( a_vNormalLoc );
+     gl.bindBuffer(gl.ARRAY_BUFFER, nBoardBuffer);
+     gl.vertexAttribPointer(a_vNormalLoc, 4, gl.FLOAT, false, 0, 0);
 	
     gl.enableVertexAttribArray( a_vPositionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, vBoardBuffer);
@@ -1430,9 +1687,17 @@ function drawBoard(texture, color){
 function boardQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
+    
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
 
     for ( var i = 0; i < indices.length; ++i ) {
         boardPoints.push( vertices[indices[i]] );
+        nBoardCoordsArray.push(normal);
         boardColors.push( color );
     }
 	
@@ -1464,6 +1729,11 @@ function drawFrame(texture, color){
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tFrameBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+
+    //----added-----
+    gl.enableVertexAttribArray( a_vNormalLoc );
+    gl.bindBuffer(gl.ARRAY_BUFFER, nFrameBuffer);
+    gl.vertexAttribPointer(a_vNormalLoc, 4, gl.FLOAT, false, 0, 0);
 	
     gl.enableVertexAttribArray( a_vPositionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, vFrameBuffer);
@@ -1476,8 +1746,16 @@ function frameQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
+
     for ( var i = 0; i < indices.length; ++i ) {
         framePoints.push( vertices[indices[i]] );
+        nFrameCoordsArray.push( normal);
         frameColors.push( color );
     }
 	
@@ -1501,8 +1779,17 @@ function whiteQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
+
+
     for ( var i = 0; i < indices.length; ++i ) {
         whitePoints.push( vertices[indices[i]] );
+        nWhiteCoordsArray.push( normal );
         whiteColors.push( color );
     }
     for ( var i = 0; i < 6; ++i ) {
@@ -1534,6 +1821,11 @@ function drawFrame(texture, color){
     gl.enableVertexAttribArray( a_vTextureCoordLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, tFrameBuffer);
     gl.vertexAttribPointer(a_vTextureCoordLoc, 2, gl.FLOAT, false, 0, 0);
+
+     //----added-----
+     gl.enableVertexAttribArray( a_vNormalLoc );
+     gl.bindBuffer(gl.ARRAY_BUFFER, nFrameBuffer);
+     gl.vertexAttribPointer(a_vNormalLoc, 4, gl.FLOAT, false, 0, 0);
 	
     gl.enableVertexAttribArray( a_vPositionLoc );
     gl.bindBuffer(gl.ARRAY_BUFFER, vFrameBuffer);
@@ -1546,8 +1838,16 @@ function frameQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
+
     for ( var i = 0; i < indices.length; ++i ) {
         framePoints.push( vertices[indices[i]] );
+        nFrameCoordsArray.push( normal);
         frameColors.push( color );
     }
 	
@@ -1571,8 +1871,16 @@ function whiteQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
+
     for ( var i = 0; i < indices.length; ++i ) {
         whitePoints.push( vertices[indices[i]] );
+        nWhiteCoordsArray.push( normal );
         whiteColors.push( color );
     }
     for ( var i = 0; i < 6; ++i ) {
@@ -1595,8 +1903,18 @@ function blackQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
+    var indices = [ a, b, c, a, c, d ];
+
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
+
     for ( var i = 0; i < indices.length; ++i ) {
         blackPoints.push( vertices[indices[i]] );
+        nBlackCoordsArray.push( normal );
         blackColors.push( color );
     }
     for ( var i = 0; i < 6; ++i ) {
@@ -1619,8 +1937,16 @@ function guideQuad(a, b, c, d, vertices, color)
 {
     var indices = [ a, b, c, a, c, d ];
 
+    var t1 = subtract(vertices[b], vertices[a]);
+    var t2 = subtract(vertices[c], vertices[b]);
+    var normal = cross(t1, t2);
+    normal = normalize(vec4(normal));
+    //normal = normalize(vec4(normal[0], normal[1], normal[2], 0.0));
+    console.log(normal);
+
     for ( var i = 0; i < indices.length; ++i ) {
         guidePoints.push( vertices[indices[i]] );
+        nGuideCoordsArray.push(normal);
         guideColors.push( color );
     }
     for ( var i = 0; i < 6; ++i ) {
@@ -1642,24 +1968,36 @@ function guideQuad(a, b, c, d, vertices, color)
 function calculateKingVertices(col, row) {
     var vertices = [
         //base square
-        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
         vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
         vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
         vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.29, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.29, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.29, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.29, 1.0 ),
 
-        //triangle
-        vec4( -0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
-        vec4( -0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.10,  0.35, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 ),
-        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.25, 1.0 ),
-        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.25, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.25, 1.0 )
+
+        // //top square
+        vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.29, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.29, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.29, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.29, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.101, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 ),
+        vec4( -0.8 + ((0.2) * col) + 0.101,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 )
+
+         //alternative design
+        // vec4( -0.8 + ((0.2) * col) + 0.16, -0.8 + ((0.2) * row) + 0.04, 0.29, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.16,  -0.8 + ((0.2) * row) + 0.16, 0.29, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.04,  -0.8 + ((0.2) * row) + 0.16, 0.29, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.04, -0.8 + ((0.2) * row) + 0.04, 0.29, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.16, -0.8 + ((0.2) * row) + 0.04,  0.31, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.16,  -0.8 + ((0.2) * row) + 0.16,  0.31, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.04,  -0.8 + ((0.2) * row) + 0.16,  0.31, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.04, -0.8 + ((0.2) * row) + 0.04,  0.31, 1.0 ),
+        
 
     ];
 
@@ -1713,6 +2051,25 @@ function drawKing() {
 
 function calculateQueenVertices(col, row){
     var queenVertices = [
+        ///alternative design
+        // vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.30, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.30, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.30, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.30, 1.0 ),
+
+        // vec4( -0.8 + ((0.2) * col) + 0.14, -0.8 + ((0.2) * row) + 0.05, 0.30, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.14,  -0.8 + ((0.2) * row) + 0.15, 0.30, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.06,  -0.8 + ((0.2) * row) + 0.15, 0.30, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.06, -0.8 + ((0.2) * row) + 0.05, 0.30, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.14, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 ),
+        // vec4( -0.8 + ((0.2) * col) + 0.14,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.06,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1.0 ),
+        // vec4( - 0.8 + ((0.2) * col) + 0.06, -0.8 + ((0.2) * row) + 0.05,  0.35, 1.0 ),
+
 
         vec4( -0.8 + 0.15 + (0.2*col), -0.8 + ((0.2) * row) + 0.05 ,  0.35, 1 ), // TBR
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.35, 1 ), //TFR
@@ -1789,24 +2146,36 @@ function drawQueen() {
 function calculateBishopVertices(col, row) {
     var vertices = [
     //base square
-    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
-    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.15, 1.0 ),
     vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
     vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
     vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
     vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.18, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.18, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.18, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.18, 1.0 ),
 
-    //triangle
-    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.10,  0.25, 1.0 ),
-    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
-    vec4( - 0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.10,  0.25, 1.0 ),
-    vec4( - 0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
-    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 ),
-    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
-    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 )
+    //alternative design
+    // vec4( -0.8 + ((0.2) * col) + 0.13, -0.8 + ((0.2) * row) + 0.07, 0.18, 1.0 ),
+    // vec4( -0.8 + ((0.2) * col) + 0.13,  -0.8 + ((0.2) * row) + 0.13, 0.18, 1.0 ),
+    // vec4( - 0.8 + ((0.2) * col) + 0.07,  -0.8 + ((0.2) * row) + 0.13, 0.18, 1.0 ),
+    // vec4( - 0.8 + ((0.2) * col) + 0.07, -0.8 + ((0.2) * row) + 0.07, 0.18, 1.0 ),
+    // vec4( -0.8 + ((0.2) * col) + 0.13, -0.8 + ((0.2) * row) + 0.07,  0.21, 1.0 ),
+    // vec4( -0.8 + ((0.2) * col) + 0.13,  -0.8 + ((0.2) * row) + 0.13,  0.21, 1.0 ),
+    // vec4( - 0.8 + ((0.2) * col) + 0.07,  -0.8 + ((0.2) * row) + 0.13,  0.21, 1.0 ),
+    // vec4( - 0.8 + ((0.2) * col) + 0.07, -0.8 + ((0.2) * row) + 0.07,  0.21, 1.0 ),
+
+
+    //base square
+    vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.18, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.18, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.18, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.18, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+    vec4( -0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15,  0.25, 1.0 ),
+    vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
+
     ];
 
     return vertices;
@@ -1909,6 +2278,7 @@ function calculateKnightVertices(col, row) {
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
         vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1.0 ),
         vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1.0 ),
+    
 
         // small rectangle on top
         vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05,  0.25, 1.0 ),
@@ -1918,7 +2288,8 @@ function calculateKnightVertices(col, row) {
         vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 ),
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
         vec4( - 0.8 + ((0.2) * col) + 0.10,  -0.8 + ((0.2) * row) + 0.15, 0.15, 1.0 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 )
+        vec4( - 0.8 + ((0.2) * col) + 0.10, -0.8 + ((0.2) * row) + 0.05, 0.15, 1.0 ),
+    
     ];
 
     return vertices;
@@ -2024,7 +2395,9 @@ function calculateRookVertices(col, row){
         vec4( -0.8 + ((0.2) * col) + 0.15, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ),
         vec4( -0.8 + ((0.2) * col) + 0.15,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ),
         vec4( - 0.8 + ((0.2) * col) + 0.05,  -0.8 + ((0.2) * row) + 0.15, 0.05, 1 ),
-        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 )
+        vec4( - 0.8 + ((0.2) * col) + 0.05, -0.8 + ((0.2) * row) + 0.05, 0.05, 1 ),
+       
+        
     ];
 
     return rookVertices;
@@ -2159,19 +2532,25 @@ function drawPieces() {
 
 function drawAll(){
      gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
-    // for trackball
-    m_inc = build_rotmatrix(m_curquat);
+     ctMatrix = build_rotmatrix(m_curquat);
     //rotate board on click
     if (rotate) {
+        console.log("rotated");
         theta += 3.14; //180 degrees == 3.14 radians
         gl.uniform1f(u_thetaLoc, theta);
         rotate = false;
+        gl.uniform1i(u_rotateBoard, true);
+        
     }
     // orthogonal projection matrix * trackball rotation matrix
     else {
-        ctMatrix = mult(ortho(-1.15, 1.15, -1.15, 1.15, -1.15, 1.15), m_inc);
+        gl.uniform1i(u_rotateBoard, false);
+        // var u_projMatrixLoc = gl.getUniformLocation( program, "u_projMatrix" );
+        // var projMatrix = ortho(-1.15, 1.15, -1.15, 1.15, -1.15, 1.15);
+        // gl.uniformMatrix4fv(u_projMatrixLoc, false, flatten(projMatrix) );
     }
-	
+
+
 	gl.uniformMatrix4fv(u_ctMatrixLoc, false, flatten(ctMatrix));
 	drawBoard(boardTexture, vec4(1.0, 1.0, 1.0, 1.0));
 	drawFrame(frameTexture, vec4(1.0, 1.0, 1.0, 1.0));

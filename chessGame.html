@@ -4,31 +4,85 @@
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" >
 
 <script id="vertex-shader" type="x-shader/x-vertex">
-attribute vec4 a_vPosition;
-attribute vec4 a_vColor;
-varying vec4 v_fColor;
-uniform mat4 u_ctMatrix;
-
-
-uniform float u_theta;
-attribute  vec2 a_vTextureCoord;
-varying vec2 v_fTextureCoord;
+  attribute vec4 a_vPosition;
+  attribute vec4 a_vColor;
+  varying vec4 v_fColor;
+  uniform mat4 u_ctMatrix;
+  
+  attribute vec4 a_vNormal;
+  uniform vec4 u_ambientProduct, u_diffuseProduct, u_specularProduct;
+  uniform vec4 u_lightPosition;
+  uniform float u_shininess;
+  uniform mat4 u_projMatrix;
+  
+  uniform float u_theta;
+  attribute  vec2 a_vTextureCoord;
+  varying vec2 v_fTextureCoord;
+  
+  uniform bool u_rotateBoard;
 
 
 void main()
 {
 
-  float s = sin(u_theta);
-  float c = cos(u_theta);
+  if(u_rotateBoard){
+    float s = sin(u_theta);
+    float c = cos(u_theta);
+    vec4 pos;
+    pos.x = c * a_vPosition.x - s * a_vPosition.y;
+    pos.y = s * a_vPosition.x + c * a_vPosition.y;
+    pos.z = a_vPosition.z;
+    pos.w = a_vPosition.w;
 
-  gl_Position.x = c * a_vPosition.x - s * a_vPosition.y;
-  gl_Position.y = s * a_vPosition.x + c * a_vPosition.y;
-  gl_Position.z = a_vPosition.z;
-  gl_Position.w = a_vPosition.w;
+    gl_Position = u_projMatrix * u_ctMatrix * pos;
+    v_fColor = a_vColor;
+    v_fTextureCoord = a_vTextureCoord;
+  }
+  else{
+    vec3 pos = (u_ctMatrix * a_vPosition).xyz;
 
-  gl_Position = u_ctMatrix * gl_Position;
-  v_fColor = a_vColor;
-  v_fTextureCoord = a_vTextureCoord;
+      
+    vec3 light;
+
+    light = (u_ctMatrix * u_lightPosition).xyz;
+    vec3 L;
+    L = normalize(light - pos);
+    vec3 V;
+    V = normalize(-pos);
+    vec3 N;
+    vec4 tempN = a_vNormal;
+    if(tempN.x<0.0||tempN.y<0.0||tempN.z<0.0){
+      tempN = -tempN;
+    }
+    N = normalize((u_ctMatrix * tempN).xyz);
+    vec3 R;
+    R = normalize(-reflect(L, N));
+
+    vec3 E = -normalize(pos);
+    vec3 H = normalize(L + E);
+
+    vec4 ambient = u_ambientProduct;
+    float Kd = max( dot(L, N), 0.0 );
+
+    vec4  diffuse = Kd*u_diffuseProduct;
+    float Ks = pow( max(dot(E, R), 0.0), u_shininess );
+    vec4  specular = Ks * u_specularProduct;
+
+    if( dot(L, N) < 0.0 ) {
+        specular = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+
+    gl_Position =  u_projMatrix * u_ctMatrix * a_vPosition;
+
+    v_fColor = ambient + diffuse + specular;
+    //v_fColor.rgb = tempN.xyz;
+    //v_fColor.rgb = N.xyz;
+
+    v_fColor.a = 1.0;
+
+    
+    v_fTextureCoord = a_vTextureCoord;  
+  }
 }
 </script>
 
@@ -42,14 +96,15 @@ uniform sampler2D u_textureSampler;
 void
 main()
 {
-    vec4 color;
-    vec4 texColor;
-    
-    color = v_fColor;
-    texColor = texture2D(u_textureSampler, v_fTextureCoord);
-	
-    gl_FragColor = color * texColor;
-   //gl_FragColor = color;
+  vec4 color;
+  vec4 texColor;
+  
+  color = v_fColor;
+  texColor = texture2D(u_textureSampler, v_fTextureCoord);
+
+//gl_FragColor = texColor;
+ gl_FragColor = texColor * color;
+ //gl_FragColor = color;
 }
 </script>
 
@@ -151,6 +206,46 @@ Change Background Color
   <option value="gold">gold</option>
 </select>
 <button id = "changeColor">Submit</button>
+
+</br>
+</br>
+<span style="margin-right: 170px;">Player 1 Piece Location</span><span>Player 2 Piece Location</span>
+<div style="display: flex;">
+  <textarea id="currWLoc" style="height: 200px; width: 300px;"></textarea>
+  <textarea id="currBLoc" style="height: 200px; width: 300px;"></textarea>
+</div>
+
+</br>
+</br>
+<span style="margin-right: 270px;">Player 1</span><span>Player 2</span>
+
+
+<div style="display: flex;">
+  <textarea id="wLog" style="height: 200px; width: 300px;"></textarea>
+  <textarea id="bLog" style="height: 200px; width: 300px;"></textarea>
+</div>
+
+</br>
+</br>
+</br>
+</br>
+<div>
+  RED   0.0 <input id="sliderR" type="range"
+   min="0.0" max="1.0" step="0.1" value="1.0" />
+   1.0
+</div>
+<div>
+  GREEN  0.0 <input id="sliderG" type="range"
+  min="0.0" max="1.0" step="0.1" value="1.0" />
+  1.0
+</div>
+<div>
+  BLUE  0.0 <input id="sliderB" type="range"
+  min="0.0" max="1.0" step="0.1" value="1.0" />
+  1.0
+</div>
+</br>
+</br>
 
 </body>
 </html>
