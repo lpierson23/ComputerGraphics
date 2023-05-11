@@ -705,6 +705,7 @@ function pieceTaken(currentLocation, color){
             for (var i = 0; i < 16; i++){
                 if (blackPieces[i]["location"][0] == currentLocation[0] && blackPieces[i]["location"][1] == currentLocation[1]){
                     blackPieces[i]["inPlay"] = false;
+                    bLog = bLog + blackPieces[i]["name"] + " taken by white \n";
                 }
             }
         }
@@ -715,6 +716,7 @@ function pieceTaken(currentLocation, color){
             for (var i = 0; i < 16; i++){
                 if (whitePieces[i]["location"][0] == currentLocation[0] && whitePieces[i]["location"][1] == currentLocation[1]){
                     whitePieces[i]["inPlay"] = false;
+                    wLog = wLog + whitePieces[i]["name"] + " taken by white \n";
                 }
             }
         }
@@ -756,13 +758,17 @@ function movePiece(){
 						whitePieces[i]["location"] = [pRow, pCol];
                         currWhitePieces[i]["location"] = [pRow+1, pCol+1];
 
+                        pieceTaken(whitePieces[i]["location"], "white");
+
                         whitePieceLoc = '';
                         for (var j= 0; j< currWhitePieces.length; j++){
-                            whitePieceLoc = whitePieceLoc + currWhitePieces[j]["name"] + ": (" + (currWhitePieces[j]["location"][0]) + ", " + (currWhitePieces[j]["location"][1]) + ") \n"
+                            if (whitePieces[j]["inPlay"]){
+                                whitePieceLoc = whitePieceLoc + currWhitePieces[j]["name"] + ": (" + (currWhitePieces[j]["location"][0]) + ", " + (currWhitePieces[j]["location"][1]) + ") \n";
+                            } else {
+                                whitePieceLoc = whitePieceLoc + currWhitePieces[j]["name"] + ": no longer in play\n";
+                            }
                         }
                         document.getElementById("currBLoc").value = whitePieceLoc; 
-                        
-                        pieceTaken(whitePieces[i]["location"], "white");
         
 						turn = "black";
                         previousTurn = "white";
@@ -809,14 +815,17 @@ function movePiece(){
 						blackPieces[i]["location"] = [pRow, pCol];
                         currBlackPieces[i]["location"] = [pRow+1, pCol+1];
 
-                    
+                        pieceTaken(blackPieces[i]["location"], "black");
+
                         blackPieceLoc = '';
                         for (var j= 0; j< currBlackPieces.length; j++){
-                            blackPieceLoc = blackPieceLoc + currBlackPieces[j]["name"] + ": (" + (currBlackPieces[j]["location"][0] + 1) + ", " + (currBlackPieces[j]["location"][1] + 1) + ") \n"
+                            if (blackPieces[j]["inPlay"]){
+                                blackPieceLoc = blackPieceLoc + currBlackPieces[j]["name"] + ": (" + (currBlackPieces[j]["location"][0] + 1) + ", " + (currBlackPieces[j]["location"][1] + 1) + ") \n"
+                            } else {
+                                blackPieceLoc = blackPieceLoc + currBlackPieces[j]["name"] + ": no longer in play\n";
+                            }
                         }
                         document.getElementById("currBLoc").value = blackPieceLoc; 
-
-                        pieceTaken(blackPieces[i]["location"], "black");
                         
 						turn = "white";
                         previousTurn = "black;"
