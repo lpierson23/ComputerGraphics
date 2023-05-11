@@ -768,7 +768,7 @@ function movePiece(){
                                 whitePieceLoc = whitePieceLoc + currWhitePieces[j]["name"] + ": no longer in play\n";
                             }
                         }
-                        document.getElementById("currBLoc").value = whitePieceLoc; 
+                        document.getElementById("currWLoc").value = whitePieceLoc; 
         
 						turn = "black";
                         previousTurn = "white";
@@ -820,7 +820,7 @@ function movePiece(){
                         blackPieceLoc = '';
                         for (var j= 0; j< currBlackPieces.length; j++){
                             if (blackPieces[j]["inPlay"]){
-                                blackPieceLoc = blackPieceLoc + currBlackPieces[j]["name"] + ": (" + (currBlackPieces[j]["location"][0] + 1) + ", " + (currBlackPieces[j]["location"][1] + 1) + ") \n"
+                                blackPieceLoc = blackPieceLoc + currBlackPieces[j]["name"] + ": (" + currBlackPieces[j]["location"][0] + ", " + currBlackPieces[j]["location"][1] + ") \n"
                             } else {
                                 blackPieceLoc = blackPieceLoc + currBlackPieces[j]["name"] + ": no longer in play\n";
                             }
